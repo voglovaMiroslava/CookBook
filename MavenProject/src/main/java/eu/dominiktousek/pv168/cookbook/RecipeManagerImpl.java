@@ -6,41 +6,47 @@
 package eu.dominiktousek.pv168.cookbook;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class RecipeManagerImpl implements RecipeManager {
 
     public void createRecipe(Recipe recipe) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //TODO
     }
 
     public void updateRecipe(Recipe recipe) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //TODO
     }
 
     public void deleteRecipe(Long id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //TODO
     }
 
     public Recipe getRecipeById(Long id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //TODO
+        return null;
     }
 
     public List<Recipe> getAllRecipes() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //TODO
+        return new ArrayList<>();
     }
 
     public List<Recipe> searchByName(String name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //TODO
+        return new ArrayList<>();
     }
 
     public List<Recipe> searchByDuration(Duration durationFrom, Duration durationTo) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //TODO
+        return new ArrayList<>();
     }
 
     public List<Recipe> search(String name, Duration durationFrom, Duration durationTo, List<Ingredient> ingredients) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //TODO
+        return new ArrayList<>();
     }
     
 }

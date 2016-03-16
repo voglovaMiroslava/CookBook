@@ -25,12 +25,12 @@ public class IngredientManagerTest {
     @Before
     public void setUp() throws SQLException {
         manager = new IngredientManagerImpl();
-        clearAllAdata();
+        clearAllData();
     }
     
     @After
     public void cleanUp(){
-        clearAllAdata();
+        clearAllData();
     }
     
     @Test
@@ -174,7 +174,7 @@ public class IngredientManagerTest {
     }
     
     
-    private void clearAllAdata(){
+    private void clearAllData(){
         List<Ingredient> all = manager.getAllIngredients();
         for (Iterator<Ingredient> it = all.iterator(); it.hasNext();) {
             Ingredient i = it.next();
