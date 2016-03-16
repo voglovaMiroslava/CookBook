@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author Dominik
+ * @author Miroslava Voglova
  */
 
 public class RecipeManagerTest {
@@ -80,7 +80,17 @@ public class RecipeManagerTest {
         rec.setDuration(Duration.ofMinutes(54L));
         manager.updateRecipe(rec);
         Recipe other = manager.getRecipeById(rec.getId());
-        assertTrue("One of the attributes does not match. Update failed.",checkAttributes(rec, other));
+        assertTrue("After duration update one or more of the attributes does not match.",checkAttributes(rec, other));
+
+        rec.setInstructions("other, more useful instructions");
+        manager.updateRecipe(rec);
+        other = manager.getRecipeById(rec.getId());
+        assertTrue("After recipe update one or more of the attributes does not match.",checkAttributes(rec, other));
+
+        rec.setName("fancy new name");
+        manager.updateRecipe(rec);
+        other = manager.getRecipeById(rec.getId());
+        assertTrue("After recipe update one or more of the attributes does not match.",checkAttributes(rec, other));
     }
 
     @Test(expected = IllegalArgumentException.class)
