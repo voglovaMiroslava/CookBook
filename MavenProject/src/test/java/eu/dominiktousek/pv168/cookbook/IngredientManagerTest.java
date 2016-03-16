@@ -7,7 +7,6 @@ package eu.dominiktousek.pv168.cookbook;
 
 import java.sql.SQLException;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import org.junit.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -176,8 +175,7 @@ public class IngredientManagerTest {
     
     private void clearAllData(){
         List<Ingredient> all = manager.getAllIngredients();
-        for (Iterator<Ingredient> it = all.iterator(); it.hasNext();) {
-            Ingredient i = it.next();
+        for (Ingredient i : all) {
             manager.removeIngredient(i);
         }
     }

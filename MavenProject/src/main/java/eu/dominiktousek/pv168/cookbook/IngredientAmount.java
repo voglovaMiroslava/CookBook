@@ -12,7 +12,7 @@ package eu.dominiktousek.pv168.cookbook;
 public class IngredientAmount {
     private Long id;
     private Long recipeId;
-    private Long ingredientId;
+    private Ingredient ingredient;
     private String amount;
 
     public IngredientAmount() {}
@@ -33,12 +33,12 @@ public class IngredientAmount {
         this.recipeId = recipeId;
     }
 
-    public Long getIngredientId() {
-        return ingredientId;
+    public Ingredient getIngredient() {
+        return ingredient;
     }
 
-    public void setIngredientId(Long ingredientId) {
-        this.ingredientId = ingredientId;
+    public void setIngredient(Ingredient ingredient) {
+        this.ingredient = ingredient;
     }
 
     public String getAmount() {
@@ -54,7 +54,7 @@ public class IngredientAmount {
         int hash = 5;
         hash = 71 * hash + (this.id != null ? this.id.hashCode() : 0);
         hash = 71 * hash + (this.recipeId != null ? this.recipeId.hashCode() : 0);
-        hash = 71 * hash + (this.ingredientId != null ? this.ingredientId.hashCode() : 0);
+        hash = 71 * hash + (this.ingredient != null ? this.ingredient.hashCode() : 0);
         hash = 71 * hash + (this.amount != null ? this.amount.hashCode() : 0);
         return hash;
     }
@@ -74,7 +74,7 @@ public class IngredientAmount {
         if (this.recipeId != other.recipeId && (this.recipeId == null || !this.recipeId.equals(other.recipeId))) {
             return false;
         }
-        if (this.ingredientId != other.ingredientId && (this.ingredientId == null || !this.ingredientId.equals(other.ingredientId))) {
+        if ((this.ingredient == null) ? (other.ingredient != null) : !this.ingredient.equals(other.ingredient)) {
             return false;
         }
         if ((this.amount == null) ? (other.amount != null) : !this.amount.equals(other.amount)) {
@@ -85,7 +85,7 @@ public class IngredientAmount {
 
     @Override
     public String toString() {
-        return "IngredientAmount{" + "id=" + id + ", recipeId=" + recipeId + ", ingredientId=" + ingredientId + ", amount=" + amount + '}';
+        return "IngredientAmount{" + "id=" + id + ", recipeId=" + recipeId + ", ingredient=" + ingredient + ", amount=" + amount + '}';
     }
     
 }

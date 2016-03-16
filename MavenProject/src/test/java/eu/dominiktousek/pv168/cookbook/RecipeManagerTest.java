@@ -94,21 +94,25 @@ public class RecipeManagerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    @Ignore
     public void updateRecipeNullName(){
 
     }
 
     @Test(expected = IllegalArgumentException.class)
+    @Ignore
     public void updateRecipeEmptyName(){
 
     }
 
     @Test(expected = IllegalArgumentException.class)
+    @Ignore
     public void updateRecipeNullInstruction(){
 
     }
 
     @Test(expected = IllegalArgumentException.class)
+    @Ignore
     public void updateRecipeEmptyInstruction(){
 
     }
@@ -119,21 +123,25 @@ public class RecipeManagerTest {
     }
 */
     @Test
+    @Ignore
     public void returnsAllRecipes(){
 
     }
 
     @Test
+    @Ignore
     public void searchRecipeById(){
 
     }
 
     @Test
+    @Ignore
     public void durationSearchBothDurationsSet(){
         //ve vysledku nesmi byt recipe s null duration
     }
 
     @Test
+    @Ignore
     public void durationSearchOneDurationsSet(){
         //absence horni hranice == od
         //absence dolni hranice == do
@@ -141,28 +149,32 @@ public class RecipeManagerTest {
     }
 
     @Test
+    @Ignore
     public void durationSearchNoneDurationsSet(){
         //melo by vratit vsechno
     }
 
     @Test
+    @Ignore
     public void searchByName(){
 
     }
 
     @Test
+    @Ignore
     public void searchByEmptyName(){
         //melo by vratit vsechno, search vyhledava full textove
 
     }
 
     @Test
+    @Ignore
     public void searchByNullName(){
         // vyhodit null argument exception
     }
 
     private static void clearData(){
-
+        //TODO Make me :)
     }
 
     private static boolean checkAttributes(Recipe one, Recipe other){
