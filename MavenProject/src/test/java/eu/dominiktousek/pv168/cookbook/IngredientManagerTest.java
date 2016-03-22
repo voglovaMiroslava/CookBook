@@ -1,29 +1,34 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package eu.dominiktousek.pv168.cookbook;
 
+import eu.dominiktousek.pv168.cookbook.daocontext.DBDataSourceFactory;
 import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.List;
+import javax.sql.DataSource;
+
 import org.junit.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 /**
- *
- * @author Dominik
+ * Test class responsible for testing IngredientManager functionality
+ * 
+ * @author Dominik Tousek (422385)
  */
 public class IngredientManagerTest {
     
     private IngredientManager manager;
+    private static DataSource dataSource;
+  
     
+    @BeforeClass
+    public static void setUpClass(){
+        dataSource = DBDataSourceFactory.getDataSource();
+    }
     
     @Before
-    public void setUp() throws SQLException {
-        manager = new IngredientManagerImpl();
+    public void setUp() throws SQLException { 
+        manager = new IngredientManagerImpl(dataSource);
         clearAllData();
     }
     
@@ -32,6 +37,7 @@ public class IngredientManagerTest {
         clearAllData();
     }
     
+    //Creation tests
     @Test
     public void createIngredientAllGood(){
         Ingredient ingredient = new Ingredient();
@@ -72,9 +78,16 @@ public class IngredientManagerTest {
         Long id = ingredient.getId();
         
         assertThat("Ingredient id after creation can't be null.", id, is(not(equalTo(null))));
-        assertThat("Ingredient name changed.",ingredient.getName(),is("Cibule"));
+        assertThat("Ingredient name changed.",ingredient.getName(),is(equalTo("Cibule")));
     }
     
+    //Update tests
+    //TODO:
+    
+    //Search tests
+    //TODO:
+    
+    //Deletition tests
     @Test
     public void removeExistingIngredient(){
         Ingredient ingredient = new Ingredient();
@@ -95,10 +108,7 @@ public class IngredientManagerTest {
     }
     
     @Test
-    public void removeNonExistentIngredient(){
-        List<Ingredient> all = manager.getAllIngredients();
-        assertThat("Storage must be empty at the test start.",all.size(),is(equalTo(0)));
-        
+    public void removeNonExistentIngredient(){        
         Ingredient ing1 = new Ingredient();
         ing1.setName("Šiška");
         
@@ -109,21 +119,22 @@ public class IngredientManagerTest {
         ing3.setName("Žábí nožička");
         
         manager.createIngredient(ing1);
-        assertThat("No id assigned during create method",ing1.getId(),is(not(equalTo(null))));
         manager.createIngredient(ing2);
-        assertThat("No id assigned during create method",ing2.getId(),is(not(equalTo(null))));
         manager.createIngredient(ing3);
-        assertThat("No id assigned during create method",ing3.getId(),is(not(equalTo(null))));
+        
+        List<Ingredient> all = manager.getAllIngredients();
         
         Ingredient nonExistent = new Ingredient();
         nonExistent.setName("Cibule");
         nonExistent.setId(Long.max(ing1.getId(), Long.max(ing2.getId(), ing3.getId()))+1);
-
-        manager.removeIngredient(nonExistent);
+        
+        try{
+            manager.removeIngredient(nonExistent);
+        }catch(EntityNotFoundException ex){
+            //ok
+        }
         
         List<Ingredient> allAfterOp = manager.getAllIngredients();
-        
-        assertThat("Creating new records in storage had no effect",allAfterOp.isEmpty(),is(equalTo(true)));
         
         all.sort(idComparator);
         allAfterOp.sort(idComparator);
@@ -132,10 +143,7 @@ public class IngredientManagerTest {
     }
     
     @Test
-    public void removeIngredientWithNullId(){
-        List<Ingredient> all = manager.getAllIngredients();
-        assertThat("Storage must be empty at the test start.",all.size(),is(equalTo(0)));
-        
+    public void removeIngredientWithNullId(){      
         Ingredient ing1 = new Ingredient();
         ing1.setName("Šiška");
         
@@ -146,12 +154,10 @@ public class IngredientManagerTest {
         ing3.setName("Žábí nožička");
         
         manager.createIngredient(ing1);
-        assertThat("No id assigned during create method",ing1.getId(),is(not(equalTo(null))));
         manager.createIngredient(ing2);
-        assertThat("No id assigned during create method",ing2.getId(),is(not(equalTo(null))));
         manager.createIngredient(ing3);
-        assertThat("No id assigned during create method",ing3.getId(),is(not(equalTo(null))));
         
+        List<Ingredient> all = manager.getAllIngredients();
         
         Ingredient nonExistent = new Ingredient();
         nonExistent.setName("Cibule");
@@ -171,7 +177,6 @@ public class IngredientManagerTest {
         
         assertThat("Attempt to remove non-existing record from storage caused data loss",all,is(equalTo(allAfterOp)));
     }
-    
     
     private void clearAllData(){
         List<Ingredient> all = manager.getAllIngredients();
