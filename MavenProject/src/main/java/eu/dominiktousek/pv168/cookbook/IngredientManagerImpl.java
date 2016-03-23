@@ -183,7 +183,7 @@ public class IngredientManagerImpl implements IngredientManager {
         try(
                 Connection connection = this.dataSource.getConnection();
                 PreparedStatement statement = connection.prepareStatement(
-                        "SELECT * FROM Ingredient WHERE NAME LIKE '?%'")
+                        "SELECT * FROM Ingredient WHERE NAME LIKE '%?%'")
                 ){
             
             statement.setString(1, name);
@@ -200,7 +200,7 @@ public class IngredientManagerImpl implements IngredientManager {
      * Executes given <b>PreparedStatement</b> and parses acquired <b>ResultSet</b> to list of <b>Ingredient</b>s
      * 
      * @param statement Statement to be executed 
-     * @return  List of Ingredients parsed from ResultSet of given statement
+     * @return List of Ingredients parsed from ResultSet of given statement
      * @throws SQLException 
      */
     private List<Ingredient> parseRows(final PreparedStatement statement) throws SQLException {
@@ -212,13 +212,25 @@ public class IngredientManagerImpl implements IngredientManager {
             ResultSet set = statement.getResultSet();
             ArrayList<Ingredient> items = new ArrayList<>();
             while(set.next()){
-                Ingredient ingredient = new Ingredient();
-                ingredient.setId(set.getLong("ID"));
-                ingredient.setName(set.getString("NAME"));
-                items.add(ingredient);
+                items.add(fromResultSet(set));
             }
             return items;
         }
+    }
+    
+    /**
+     * Parses one Ingredient object from ResultSet on actual cursor position
+     * 
+     * @param set ResultSet to load data from
+     * @return Parsed Ingredient object
+     * @throws SQLException 
+     */
+    private static Ingredient fromResultSet(ResultSet set) throws SQLException{
+        Ingredient ingredient = new Ingredient();
+        ingredient.setId(set.getLong("ID"));
+        ingredient.setName(set.getString("NAME"));
+        
+        return ingredient;
     }
     
     /**

@@ -18,21 +18,16 @@ import static org.junit.Assert.*;
 /**
  * @author Miroslava Voglova
  */
-
 public class RecipeManagerTest {
-
+    
     private RecipeManager manager;
     private DBUtilRecipeImpl dbKeeper = new DBUtilRecipeImpl();
-
+    
     @Before
     public void init() throws SQLException {
         manager = new RecipeManagerImpl();
-        dbKeeper.createTable();
-    }
-
-    @After
-    public void clean() throws SQLException {
         dbKeeper.removeTable();
+        dbKeeper.createTable();
     }
 
     @Test
@@ -81,7 +76,7 @@ public class RecipeManagerTest {
         manager.createRecipe(rec);
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void createWithExistingId() {
         Recipe rec = createRecipe("fancy name", "awesome instructions", Duration.ofMinutes(41L));
         rec.setId(7L);
@@ -165,8 +160,8 @@ public class RecipeManagerTest {
         List<Recipe> controlValues = fullDatabase();
         List<Recipe> valuesFromManager = manager.searchByDuration(Duration.ofMinutes(15L), Duration.ofHours(2L));
         controlValues.removeIf((Recipe rec) -> rec.getDuration() == null
-                || rec.getDuration().getSeconds() < Duration.ofMinutes(15L).getSeconds()
-                || rec.getDuration().getSeconds() > Duration.ofHours(2L).getSeconds());
+                || rec.getDuration().compareTo(Duration.ofMinutes(15L))<=0
+                || rec.getDuration().compareTo(Duration.ofHours(2L))>=0);
 
         controlValues.sort(idComparator);
         valuesFromManager.sort(idComparator);
@@ -178,7 +173,7 @@ public class RecipeManagerTest {
         List<Recipe> controlValues = fullDatabase();
         List<Recipe> valuesFromManager = manager.searchByDuration(Duration.ofMinutes(15L), null);
         controlValues.removeIf((Recipe rec) -> rec.getDuration() == null
-                || rec.getDuration().getSeconds() < Duration.ofMinutes(15L).getSeconds());
+                || rec.getDuration().compareTo(Duration.ofMinutes(15L))<=0);
 
         controlValues.sort(idComparator);
         valuesFromManager.sort(idComparator);
@@ -190,7 +185,7 @@ public class RecipeManagerTest {
         List<Recipe> controlValues = fullDatabase();
         List<Recipe> valuesFromManager = manager.searchByDuration(null, Duration.ofHours(2L));
         controlValues.removeIf((Recipe rec) -> rec.getDuration() == null
-                || rec.getDuration().getSeconds() > Duration.ofHours(2L).getSeconds());
+                || rec.getDuration().compareTo(Duration.ofHours(2L))>=0);
 
         controlValues.sort(idComparator);
         valuesFromManager.sort(idComparator);
@@ -239,11 +234,11 @@ public class RecipeManagerTest {
     private List<Recipe> fullDatabase() {
         Recipe rec1 = createRecipe("name", "instruction", Duration.ofMinutes(87L));
         Recipe rec2 = createRecipe("PotatoesSoup", "water and potatoes mixed together", Duration.ofHours(2L));
-        Recipe rec3 = createRecipe("TunnaFried", "AI! tunna tunna", Duration.ofSeconds(45L));
+        Recipe rec3 = createRecipe("TunnaFried", "AI! tunna tunna", Duration.ofMinutes(45L));
         Recipe rec4 = createRecipe("LovePotion", "frog legs and more", Duration.ofDays(8L));
         Recipe rec5 = createRecipe("Dont eat this", "to much expensive to do", null);
 
-        List<Recipe> allRecipes = Arrays.asList(rec1, rec2, rec3, rec4, rec5);
+        List<Recipe> allRecipes = new ArrayList<>(Arrays.asList(rec1, rec2, rec3, rec4, rec5));
         for (Recipe recipe : allRecipes) {
             manager.createRecipe(recipe);
         }

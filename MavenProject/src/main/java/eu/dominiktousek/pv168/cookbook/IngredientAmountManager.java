@@ -21,6 +21,6 @@ public interface IngredientAmountManager {
     
     List<IngredientAmount> getIngredientsByRecipe(Long recipeId);
     
-    List<Recipe> getRecipesByIngredients(List<Ingredient> ingredients);
+    //List<Recipe> getRecipesByIngredients(List<Ingredient> ingredients);
     
 }

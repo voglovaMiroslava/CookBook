@@ -7,7 +7,7 @@ import java.sql.SQLException;
  */
 public interface DBUtil {
 
-    void createTable() throws SQLException;
+    void createTable();
 
-    void removeTable() throws SQLException;
+    void removeTable();
 }

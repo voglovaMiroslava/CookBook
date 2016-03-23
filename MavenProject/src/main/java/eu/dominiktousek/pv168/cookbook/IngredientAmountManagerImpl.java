@@ -26,8 +26,10 @@ public class IngredientAmountManagerImpl implements IngredientAmountManager {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    /*
     public List<Recipe> getRecipesByIngredients(List<Ingredient> ingredients) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+    */
     
 }
