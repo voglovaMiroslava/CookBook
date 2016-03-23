@@ -1,52 +1,166 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package eu.dominiktousek.pv168.cookbook;
 
+import eu.dominiktousek.pv168.cookbook.daocontext.DBDataSourceFactory;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import javax.sql.DataSource;
 
-
+/**
+ * Implementation of manager responsible for CRUD operations on Recipe.
+ * Based on SQL database storage
+ * 
+ * @author Dominik Tousek (422385) & Miroslava Voglova (382579)
+ */
 public class RecipeManagerImpl implements RecipeManager {
 
+    private final DataSource dataSource;
+
+    public RecipeManagerImpl() {
+        this(DBDataSourceFactory.getDataSource());
+    }
+    
+    public RecipeManagerImpl(DataSource dataSource) {
+        this.dataSource=dataSource;
+    }
+       
+    @Override
     public void createRecipe(Recipe recipe) {
-        //TODO
+        validate(recipe, true);
+        
+        if(recipe.getId()!=null){
+            throw new IllegalArgumentException("Id of recipe was already set!");
+        }
+        //TODO:
+        /*
+        try(
+                Connection connection = this.dataSource.getConnection();
+                PreparedStatement statement = connection.prepareStatement(
+                        "INSERT INTO Recipe (NAME,LOWERNAME) VALUES(?,LOWER(?))", 
+                        Statement.RETURN_GENERATED_KEYS);){
+            statement.setString(1,recipe.getName());
+            statement.setString(2,recipe.getName());
+            int count = statement.executeUpdate();
+            if(count!=1){
+                throw new ServiceFailureException("No generated key retrieved from database!");
+            }
+            
+            ResultSet set = statement.getGeneratedKeys();
+            if(!set.next()){
+                throw new ServiceFailureException("No generated key retrieved from database!");
+            }
+            Long id = set.getLong(1);
+            if(set.next()){
+                throw new ServiceFailureException("More than one record in database affected during one CREATE!");
+            }
+            recipe.setId(id);
+            
+        }catch(SQLException ex){
+            System.err.println(ex);
+            throw new ServiceFailureException("Error occured while creating new recipe '" + recipe + "'",ex);
+        }*/
     }
 
+    @Override
     public void updateRecipe(Recipe recipe) {
+        validate(recipe);
+        
         //TODO
     }
 
+    @Override
     public void deleteRecipe(Long id) {
+        if(id==null){
+            throw new IllegalArgumentException("Id can't be null!");
+        }
         //TODO
     }
 
+    @Override
     public Recipe getRecipeById(Long id) {
+        if(id==null){
+            throw new IllegalArgumentException("Id can't be null!");
+        }
         //TODO
         return null;
     }
 
+    @Override
     public List<Recipe> getAllRecipes() {
         //TODO
         return new ArrayList<>();
     }
 
+    @Override
     public List<Recipe> searchByName(String name) {
-        //TODO
-        return new ArrayList<>();
+        return search(name, null, null, null);
     }
 
+    @Override
     public List<Recipe> searchByDuration(Duration durationFrom, Duration durationTo) {
+        return search("", durationFrom, durationTo, null);
+    }
+
+    @Override
+    public List<Recipe> search(String name, Duration durationFrom, Duration durationTo, List<Ingredient> ingredients) {
+        if(name==null){
+            throw new IllegalArgumentException("name can't be null");
+        }
         //TODO
         return new ArrayList<>();
     }
-
-    public List<Recipe> search(String name, Duration durationFrom, Duration durationTo, List<Ingredient> ingredients) {
-        //TODO
-        return new ArrayList<>();
+    
+    /**
+     * Validates given recipe - tests for null values of object it self, 
+     * name atribute, instructions atribute and an id. Name and instructions are also tested for empty value.
+     * <b>In case of validation fail, IllegalArgumentException is thrown.</b>
+     * 
+     * @param recipe        recipe object to be tested
+     * @throws IllegalArgumentException
+     */
+    private void validate(Recipe recipe){
+        validate(recipe, false);
+    }
+    
+    /**
+     * Validates given recipe - tests for null values of object it self, 
+     * name atribute, instructions atribute and optionally an id. Name and instructions are also tested for empty value.
+     * <b>In case of validation fail, IllegalArgumentException is thrown.</b>
+     * 
+     * @param recipe        recipe object to be tested
+     * @param allowNullIdentity true - recipe id wont be tested for null value | false - recipe id will be tested for null value
+     * @throws IllegalArgumentException
+     */
+    private void validate(Recipe recipe, boolean allowNullIdentity){
+        /*
+        id - optionally could be null
+        name - can't be null or empty
+        instructions - can't be null or empty
+        duration - could be null
+        */
+        if(recipe==null){
+            throw new IllegalArgumentException("Null recipe entity supplied!");
+        } 
+        if(recipe.getName()==null){
+            throw new IllegalArgumentException("Name of recipe can't be null!");
+        }
+        if(recipe.getName().isEmpty()){
+            throw new IllegalArgumentException("Name of recipe can't be empty!");
+        }
+        if(recipe.getInstructions()==null){
+            throw new IllegalArgumentException("Instructions of recipe can't be null!");
+        }
+        if(recipe.getInstructions().isEmpty()){
+            throw new IllegalArgumentException("Instructions of recipe can't be empty!");
+        }
+        if(!allowNullIdentity && recipe.getId()==null){
+            throw new IllegalArgumentException("Id of recipe can't be null!");
+        }
     }
     
 }

@@ -81,6 +81,9 @@ public class IngredientManagerTest {
         assertThat("Ingredient name changed.",ingredient.getName(),is(equalTo("Cibule")));
     }
     
+    //Retrieve tests
+    //TODO:
+    
     //Update tests
     //TODO:
     

@@ -1,5 +1,6 @@
 package eu.dominiktousek.pv168.cookbook;
 
+import eu.dominiktousek.pv168.cookbook.daocontext.DBDataSourceFactory;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,7 +19,13 @@ import javax.sql.DataSource;
 public class IngredientManagerImpl implements IngredientManager {
 
     private final DataSource dataSource;
-    
+
+    /**
+     * Creates instance of IngredientManager with DataSource from config file
+     */
+    public IngredientManagerImpl() {
+        this(DBDataSourceFactory.getDataSource());
+    }
     
     /**
      * Creates instance of IngredientManager with given DataSource
@@ -215,9 +222,9 @@ public class IngredientManagerImpl implements IngredientManager {
     }
     
     /**
-     * Validates given ingredient - tests for null values o object it self, 
-     * name atribute and optionally an id. Name is also tested for empty value.
-     * <b>If case of validation fail, IllegalArgumentException is thrown.</b>
+     * Validates given ingredient - tests for null values of object it self, 
+     * name atribute and an id. Name is also tested for empty value.
+     * <b>In case of validation fail, IllegalArgumentException is thrown.</b>
      * 
      * @param ingredient        ingredient object to be tested
      * @throws IllegalArgumentException
@@ -227,9 +234,9 @@ public class IngredientManagerImpl implements IngredientManager {
     }
     
     /**
-     * Validates given ingredient - tests for null values o object it self, 
+     * Validates given ingredient - tests for null values of object it self, 
      * name atribute and optionally an id. Name is also tested for empty value.
-     * <b>If case of validation fail, IllegalArgumentException is thrown.</b>
+     * <b>In case of validation fail, IllegalArgumentException is thrown.</b>
      * 
      * @param ingredient        ingredient object to be tested
      * @param allowNullIdentity true - ingredient id wont be tested for null value | false - ingredient id will be tested for null value
