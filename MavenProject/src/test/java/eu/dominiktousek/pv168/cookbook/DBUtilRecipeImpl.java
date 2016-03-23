@@ -25,7 +25,7 @@ public class DBUtilRecipeImpl implements DBUtil {
             + "ID bigint NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
             + "NAME VARCHAR(255) NOT NULL ,"
             + "INSTRUCTIONS VARCHAR(" + twoA4Pages +") NOT NULL,"
-            + "DURATION VARCHAR(255) NULLABLE ").executeUpdate();
+            + "DURATION bigint)").executeUpdate();
         }
 
     }
