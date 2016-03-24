@@ -19,22 +19,24 @@ public class IngredientManagerTest {
     
     private IngredientManager manager;
     private static DataSource dataSource;
+    private static final DBUtilDerbyImpl dbKeeper = new DBUtilDerbyImpl();
   
     
     @BeforeClass
     public static void setUpClass(){
         dataSource = DBDataSourceFactory.getDataSource();
+        dbKeeper.prepareDatabase();
+    }
+    
+    @AfterClass
+    public static void cleanUpClass(){
+        dbKeeper.clearDatabase();
     }
     
     @Before
     public void setUp() throws SQLException { 
         manager = new IngredientManagerImpl(dataSource);
-        clearAllData();
-    }
-    
-    @After
-    public void cleanUp(){
-        clearAllData();
+        dbKeeper.clearDatabase();
     }
     
     //Creation tests
@@ -179,13 +181,6 @@ public class IngredientManagerTest {
         allAfterOp.sort(idComparator);
         
         assertThat("Attempt to remove non-existing record from storage caused data loss",all,is(equalTo(allAfterOp)));
-    }
-    
-    private void clearAllData(){
-        List<Ingredient> all = manager.getAllIngredients();
-        for (Ingredient i : all) {
-            manager.removeIngredient(i);
-        }
     }
     
     private static final Comparator<Ingredient> idComparator = new Comparator<Ingredient>() {

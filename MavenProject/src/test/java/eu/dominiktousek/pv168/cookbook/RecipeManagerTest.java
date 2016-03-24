@@ -21,13 +21,22 @@ import static org.junit.Assert.*;
 public class RecipeManagerTest {
     
     private RecipeManager manager;
-    private DBUtilRecipeImpl dbKeeper = new DBUtilRecipeImpl();
+    private static final DBUtilDerbyImpl dbKeeper = new DBUtilDerbyImpl();
+    
+    @BeforeClass
+    public static void setUpClass(){
+        dbKeeper.prepareDatabase();
+    }
+    
+    @AfterClass
+    public static void cleanUpClass(){
+        dbKeeper.clearDatabase();
+    }
     
     @Before
     public void init() throws SQLException {
         manager = new RecipeManagerImpl();
-        dbKeeper.removeTable();
-        dbKeeper.createTable();
+        dbKeeper.clearDatabase();
     }
 
     @Test
