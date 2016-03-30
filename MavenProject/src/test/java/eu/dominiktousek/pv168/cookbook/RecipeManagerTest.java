@@ -1,4 +1,3 @@
-
 package eu.dominiktousek.pv168.cookbook;
 
 import org.junit.*;
@@ -15,26 +14,27 @@ import static org.junit.Assert.*;
  * @author Miroslava Voglova
  */
 public class RecipeManagerTest {
-    
+
     private RecipeManager manager;
-    private static final DBUtilDerbyImpl dbKeeper = new DBUtilDerbyImpl();
-    
+    private static final DBUtilDerbyImpl DB_KEEPER = new DBUtilDerbyImpl();
+
     @BeforeClass
-    public static void setUpClass(){
-        dbKeeper.prepareDatabase();
+    public static void setUpClass() {
+        DB_KEEPER.prepareDatabase();
     }
-    
+
     @AfterClass
-    public static void cleanUpClass(){
-        dbKeeper.clearDatabase();
+    public static void cleanUpClass() {
+        DB_KEEPER.clearDatabase();
     }
-    
+
     @Before
     public void init() throws SQLException {
         manager = new RecipeManagerImpl();
-        dbKeeper.clearDatabase();
+        DB_KEEPER.clearDatabase();
     }
 
+    //create tests
     @Test
     public void createRecipeAllGood() {
         Recipe rec = createRecipe("Bramboracka", "Boil water, add potatoes", Duration.ofHours(5L));
@@ -88,6 +88,7 @@ public class RecipeManagerTest {
         manager.createRecipe(rec);
     }
 
+    //update tests
     @Test
     public void updateRecipeGood() {
         Recipe rec = createRecipe("name", "instructions", Duration.ofHours(2L));
@@ -141,13 +142,14 @@ public class RecipeManagerTest {
         manager.updateRecipe(rec);
     }
 
+    //retrieve tests
     @Test
     public void returnsAllRecipes() {
         List<Recipe> controlValues = fullDatabase();
         List<Recipe> valuesFromDatabase = manager.getAllRecipes();
 
-        controlValues.sort(idComparator);
-        valuesFromDatabase.sort(idComparator);
+        controlValues.sort(ID_COMPARATOR);
+        valuesFromDatabase.sort(ID_COMPARATOR);
 
         assertTrue(controlValues.equals(valuesFromDatabase));
     }
@@ -159,22 +161,41 @@ public class RecipeManagerTest {
         Recipe other = manager.getRecipeById(rec.getId());
         assertTrue("GetRecipeById did not return same recipe.", checkAttributes(rec, other));
     }
-    
-    //SEARCH BY NULL ID IllegalArgumentException
-    
-    //Retrieve non existent
-    
+
+    @Test(expected = IllegalArgumentException.class)
+    public void searchByNullId() {
+        manager.getRecipeById(null);
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void getNonExistentEmptyDB() {
+        manager.getRecipeById(0L);
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void getNonExistentFullDB() {
+        List<Recipe> all = fullDatabase();
+        all.sort(ID_COMPARATOR);
+        Long id = all.get(all.size() - 1).getId();
+        manager.getRecipeById(id + 1);
+    }
+
+    @Test
+    public void returnAllEmptyDB() {
+        List<Recipe> all = manager.getAllRecipes();
+        assertTrue("Should not be null, should be empty List.", all != null && all.isEmpty());
+    }
 
     @Test
     public void durationSearchBothDurationsSet() {
         List<Recipe> controlValues = fullDatabase();
         List<Recipe> valuesFromManager = manager.searchByDuration(Duration.ofMinutes(15L), Duration.ofHours(2L));
         controlValues.removeIf((Recipe rec) -> rec.getDuration() == null
-                || rec.getDuration().compareTo(Duration.ofMinutes(15L))<=0
-                || rec.getDuration().compareTo(Duration.ofHours(2L))>=0);
+                || rec.getDuration().compareTo(Duration.ofMinutes(15L)) <= 0
+                || rec.getDuration().compareTo(Duration.ofHours(2L)) >= 0);
 
-        controlValues.sort(idComparator);
-        valuesFromManager.sort(idComparator);
+        controlValues.sort(ID_COMPARATOR);
+        valuesFromManager.sort(ID_COMPARATOR);
         assertTrue(controlValues.equals(valuesFromManager));
     }
 
@@ -183,10 +204,10 @@ public class RecipeManagerTest {
         List<Recipe> controlValues = fullDatabase();
         List<Recipe> valuesFromManager = manager.searchByDuration(Duration.ofMinutes(15L), null);
         controlValues.removeIf((Recipe rec) -> rec.getDuration() == null
-                || rec.getDuration().compareTo(Duration.ofMinutes(15L))<=0);
+                || rec.getDuration().compareTo(Duration.ofMinutes(15L)) <= 0);
 
-        controlValues.sort(idComparator);
-        valuesFromManager.sort(idComparator);
+        controlValues.sort(ID_COMPARATOR);
+        valuesFromManager.sort(ID_COMPARATOR);
         assertTrue(controlValues.equals(valuesFromManager));
     }
 
@@ -195,21 +216,20 @@ public class RecipeManagerTest {
         List<Recipe> controlValues = fullDatabase();
         List<Recipe> valuesFromManager = manager.searchByDuration(null, Duration.ofHours(2L));
         controlValues.removeIf((Recipe rec) -> rec.getDuration() == null
-                || rec.getDuration().compareTo(Duration.ofHours(2L))>=0);
+                || rec.getDuration().compareTo(Duration.ofHours(2L)) >= 0);
 
-        controlValues.sort(idComparator);
-        valuesFromManager.sort(idComparator);
+        controlValues.sort(ID_COMPARATOR);
+        valuesFromManager.sort(ID_COMPARATOR);
         assertTrue(controlValues.equals(valuesFromManager));
     }
-
 
     @Test
     public void durationSearchNoneDurationsSet() {
         List<Recipe> controlValues = fullDatabase();
         List<Recipe> valuesFromManager = manager.searchByDuration(null, null);
 
-        controlValues.sort(idComparator);
-        valuesFromManager.sort(idComparator);
+        controlValues.sort(ID_COMPARATOR);
+        valuesFromManager.sort(ID_COMPARATOR);
         assertTrue("When no duration boundary is set, all values should be returned.", controlValues.equals(valuesFromManager));
     }
 
@@ -217,11 +237,11 @@ public class RecipeManagerTest {
     public void searchByName() {
         List<Recipe> controlValues = fullDatabase();
         List<Recipe> valuesFromManager = manager.searchByName("na");
-        controlValues.removeIf((Recipe rec) ->
-                !(Pattern.compile(Pattern.quote("na"), Pattern.CASE_INSENSITIVE).matcher(rec.getName()).find()));
+        controlValues.removeIf((Recipe rec)
+                -> !(Pattern.compile(Pattern.quote("na"), Pattern.CASE_INSENSITIVE).matcher(rec.getName()).find()));
 
-        controlValues.sort(idComparator);
-        valuesFromManager.sort(idComparator);
+        controlValues.sort(ID_COMPARATOR);
+        valuesFromManager.sort(ID_COMPARATOR);
         assertTrue(controlValues.equals(valuesFromManager));
     }
 
@@ -230,8 +250,8 @@ public class RecipeManagerTest {
         List<Recipe> controlValues = fullDatabase();
         List<Recipe> valuesFromManager = manager.searchByName("");
 
-        controlValues.sort(idComparator);
-        valuesFromManager.sort(idComparator);
+        controlValues.sort(ID_COMPARATOR);
+        valuesFromManager.sort(ID_COMPARATOR);
         assertTrue("Should return all records.", controlValues.equals(valuesFromManager));
     }
 
@@ -240,37 +260,42 @@ public class RecipeManagerTest {
         List<Recipe> controlValues = fullDatabase();
         List<Recipe> valuesFromManager = manager.searchByName(null);
     }
-    
+
+    //deletion tests
     @Test(expected = EntityNotFoundException.class)
-    public void removeNonExisting(){
+    public void removeNonExisting() {
         manager.deleteRecipe(0L);
     }
-    
+
+    @Test(expected = IllegalArgumentException.class)
+    public void removeIdNull() {
+        manager.deleteRecipe(null);
+    }
+
     @Test
-    public void removeExisting(){
+    public void removeExisting() {
         Recipe rec = createRecipe("Polifka", "voda a syrup", Duration.ZERO);
         manager.createRecipe(rec);
         manager.deleteRecipe(rec.getId());
-        
+
         List<Recipe> allfromDatabase = manager.getAllRecipes();
-        assertTrue("Recipe was not deleted from database.", allfromDatabase.isEmpty());       
+        assertTrue("Recipe was not deleted from database.", allfromDatabase.isEmpty());
     }
-    
-    
+
     @Test
-    public void removeWontCorruptData(){
+    public void removeFromFullDB() {
         List<Recipe> all = fullDatabase();
-        
+
         Long idToRemove = all.get(0).getId();
         all.remove(0);
         manager.deleteRecipe(idToRemove);
-        
+
         List<Recipe> allFromDatabase = manager.getAllRecipes();
-        
+
         assertThat("After deletion, other data in database was corrupted.", all, is(equalTo(allFromDatabase)));
     }
-    
-    
+
+    //help methods
     private List<Recipe> fullDatabase() {
         Recipe rec1 = createRecipe("name", "instruction", Duration.ofMinutes(87L));
         Recipe rec2 = createRecipe("PotatoesSoup", "water and potatoes mixed together", Duration.ofHours(2L));
@@ -323,10 +348,6 @@ public class RecipeManagerTest {
         return rec;
     }
 
-    private static final Comparator<Recipe> idComparator = new Comparator<Recipe>() {
-        @Override
-        public int compare(Recipe o1, Recipe o2) {
-            return o1.getId().compareTo(o2.getId());
-        }
-    };
+    private static final Comparator<Recipe> ID_COMPARATOR
+            = (Recipe o1, Recipe o2) -> o1.getId().compareTo(o2.getId());
 }
