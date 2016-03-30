@@ -56,15 +56,16 @@ public class IngredientManagerImpl implements IngredientManager {
                 throw new ServiceFailureException("No generated key retrieved from database!");
             }
             
-            ResultSet set = statement.getGeneratedKeys();
-            if(!set.next()){
-                throw new ServiceFailureException("No generated key retrieved from database!");
+            try(ResultSet set = statement.getGeneratedKeys()){
+                if(!set.next()){
+                    throw new ServiceFailureException("No generated key retrieved from database!");
+                }
+                Long id = set.getLong(1);
+                if(set.next()){
+                    throw new ServiceFailureException("More than one record in database affected during one CREATE!");
+                }
+                ingredient.setId(id);
             }
-            Long id = set.getLong(1);
-            if(set.next()){
-                throw new ServiceFailureException("More than one record in database affected during one CREATE!");
-            }
-            ingredient.setId(id);
             
         }catch(SQLException ex){
             System.err.println(ex);
@@ -138,24 +139,22 @@ public class IngredientManagerImpl implements IngredientManager {
             
             statement.setLong(1,id);
             
-            boolean hasResult = statement.execute();
-            if(!hasResult){
-                return null;
+            try(ResultSet set = statement.executeQuery()){
+                if(set.next()){
+                    Ingredient rv = fromResultSet(set);
+                    if(set.next()){
+                        throw new ServiceFailureException("More than one record retrieved from database for id="+id);
+                    } 
+                    return rv;
+                }
+                else{
+                    throw new EntityNotFoundException("Requested entity with id '"+id+"' was not found!");
+                }         
             }
-            else{
-                ResultSet set = statement.getResultSet();
-                if(set.next()){
-                    return fromResultSet(set);
-                }
-                if(set.next()){
-                    throw new ServiceFailureException("More than one record retrieved from database for id="+id);
-                }
-            }            
         }catch(SQLException ex){
             System.err.println(ex);
             throw new ServiceFailureException("Error occured while retrieving ingredient with id " + id,ex);
         }
-        return null;
     }
 
     @Override
@@ -204,12 +203,7 @@ public class IngredientManagerImpl implements IngredientManager {
      * @throws SQLException 
      */
     private List<Ingredient> parseRows(final PreparedStatement statement) throws SQLException {
-        boolean hasResult = statement.execute();
-        if(!hasResult){
-            return new ArrayList();
-        }
-        else{
-            ResultSet set = statement.getResultSet();
+        try(ResultSet set = statement.executeQuery()){
             ArrayList<Ingredient> items = new ArrayList<>();
             while(set.next()){
                 items.add(fromResultSet(set));
