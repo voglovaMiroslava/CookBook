@@ -183,16 +183,16 @@ public class IngredientManagerImpl implements IngredientManager {
         try(
                 Connection connection = this.dataSource.getConnection();
                 PreparedStatement statement = connection.prepareStatement(
-                        "SELECT * FROM Ingredient WHERE NAME LIKE '%?%'")
+                        "SELECT * FROM Ingredient WHERE NAME LIKE ?")
                 ){
-            
-            statement.setString(1, name);
+            String qName = "%"+name+"%";
+            statement.setString(1, qName);
             
             return parseRows(statement);  
             
         }catch(SQLException ex){
             System.err.println(ex);
-            throw new ServiceFailureException("Error occured while retrieving all ingredients",ex);
+            throw new ServiceFailureException("Error occured while retrieving ingredients",ex);
         }
     }
 
