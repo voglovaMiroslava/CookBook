@@ -145,10 +145,7 @@ public class IngredientManagerImpl implements IngredientManager {
             else{
                 ResultSet set = statement.getResultSet();
                 if(set.next()){
-                    Ingredient ingredient = new Ingredient();
-                    ingredient.setId(set.getLong("ID"));
-                    ingredient.setName(set.getString("NAME"));
-                    return ingredient;
+                    return fromResultSet(set);
                 }
                 if(set.next()){
                     throw new ServiceFailureException("More than one record retrieved from database for id="+id);

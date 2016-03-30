@@ -6,12 +6,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
 
 public class IngredientAmountManagerImpl implements IngredientAmountManager {
 
     private final DataSource dataSource;
+    private final IngredientManager ingredientManager;
 
     public IngredientAmountManagerImpl() {
         this(DBDataSourceFactory.getDataSource());
@@ -19,6 +21,7 @@ public class IngredientAmountManagerImpl implements IngredientAmountManager {
 
     public IngredientAmountManagerImpl(DataSource dataSource) {
         this.dataSource = dataSource;
+        ingredientManager = new IngredientManagerImpl(dataSource);
     }
 
     @Override
@@ -123,7 +126,34 @@ public class IngredientAmountManagerImpl implements IngredientAmountManager {
     
     @Override
     public IngredientAmount getIngredientAmountById(Long id) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(id==null){
+            throw new IllegalArgumentException("Argument id can't be null");
+        }
+        
+        try(
+                Connection connection = this.dataSource.getConnection();
+                PreparedStatement statement = connection.prepareStatement(
+                        "SELECT * FROM INGREDIENTAMOUNT WHERE ID=?")
+                ){
+            
+            statement.setLong(1,id);
+            
+            try(ResultSet set = statement.executeQuery()){
+                if(set.next()){
+                    IngredientAmount rv = fromResultSet(set);
+                    if(set.next()){
+                        throw new ServiceFailureException("More than one record retrieved from database for id="+id);
+                    }
+                    return rv;
+                }
+                else{
+                    throw new EntityNotFoundException("Requested entity with id '"+id+"' was not found!");
+                }
+            }
+        }catch(SQLException ex){
+            System.err.println(ex);
+            throw new ServiceFailureException("Error occured while retrieving ingredient with id " + id,ex);
+        }
     }
 
     private void validate(IngredientAmount amount, Boolean allowNullId) throws IllegalArgumentException {
@@ -148,5 +178,43 @@ public class IngredientAmountManagerImpl implements IngredientAmountManager {
         if (!allowNullId && amount.getId() == null) {
             throw new IllegalArgumentException("IngredientAmount should have id.");
         }
+    }
+    
+    /**
+     * Executes given <b>PreparedStatement</b> and parses acquired <b>ResultSet</b> to list of <b>IngredientAmount</b>s
+     * 
+     * @param statement Statement to be executed 
+     * @return List of IngredientAmounts parsed from ResultSet of given statement
+     * @throws SQLException 
+     */
+    private List<IngredientAmount> parseRows(final PreparedStatement statement) throws SQLException {
+        try(ResultSet set = statement.executeQuery()){
+            ArrayList<IngredientAmount> items = new ArrayList<>();
+
+            while(set.next()){
+                items.add(fromResultSet(set));
+            }
+            return items;
+        }
+    }
+    
+    /**
+     * Parses one IngredientAmount object from ResultSet on actual cursor position
+     * 
+     * @param set ResultSet to load data from
+     * @return Parsed IngredientAmount object
+     * @throws SQLException 
+     */
+    private IngredientAmount fromResultSet(ResultSet set) throws SQLException{
+        IngredientAmount ingredientAmount = new IngredientAmount();
+        ingredientAmount.setId(set.getLong("ID"));
+        ingredientAmount.setRecipeId(set.getLong("RECIPEID"));
+        ingredientAmount.setAmount(set.getString("AMOUNT"));
+        
+        Long ingredientId = set.getLong("INGREDIENTID");
+        
+        ingredientAmount.setIngredient(ingredientManager.getIngredientById(ingredientId));
+        
+        return ingredientAmount;
     }
 }

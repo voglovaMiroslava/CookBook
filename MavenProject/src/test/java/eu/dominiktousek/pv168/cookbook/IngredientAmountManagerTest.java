@@ -134,8 +134,12 @@ public class IngredientAmountManagerTest {
     
     @Test
     public void getIngredientAmountByIdNonExistentOnEmptyDB(){        
-        IngredientAmount dbValue = manager.getIngredientAmountById(20l);
-        assertThat(dbValue,is(equalTo(null)));
+        try{
+            IngredientAmount dbValue = manager.getIngredientAmountById(20l);
+            fail();
+        }catch(EntityNotFoundException ex){
+            //OK
+        }
     }
     
     @Test
@@ -150,9 +154,12 @@ public class IngredientAmountManagerTest {
         manager.addIngredientInRecipe(item);
         assertThat(item.getId(),is(not(equalTo(null))));
         
-        IngredientAmount dbValue = manager.getIngredientAmountById(item.getId()+20l);
-        assertThat(dbValue,is(not(equalTo(item))));
-        assertThat(dbValue,is(equalTo(null)));
+        try{
+            IngredientAmount dbValue = manager.getIngredientAmountById(item.getId()+20l);
+            fail();
+        }catch(EntityNotFoundException ex){
+            //OK
+        }
     }
     
     @Test(expected = IllegalArgumentException.class)
