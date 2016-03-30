@@ -37,8 +37,7 @@ public class IngredientAmountManagerTest {
     
     @Before
     public void setUp() throws SQLException { 
-        //manager = new IngredientAmountManagerImpl(dataSource);
-        manager = new IngredientAmountManagerImpl();
+        manager = new IngredientAmountManagerImpl(dataSource);
         iMan = new IngredientManagerImpl(dataSource);
         rMan = new RecipeManagerImpl(dataSource);
         dbKeeper.clearDatabase();
@@ -103,7 +102,7 @@ public class IngredientAmountManagerTest {
         manager.addIngredientInRecipe(item);
     }
     
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void addIngredientAmountOK(){
         Recipe recipe = newRecipe(null, "Nudle s mákem", "Not tellin ya!", Duration.ofMinutes(30l));
         rMan.createRecipe(recipe);
@@ -388,7 +387,7 @@ public class IngredientAmountManagerTest {
         manager.addIngredientInRecipe(item);
         
         Ingredient ingredient2 = newIngredient(null, "Cibule2");
-        iMan.createIngredient(ingredient);
+        iMan.createIngredient(ingredient2);
         item.setIngredient(ingredient2);
         
         manager.updateIngredientInRecipe(item);
@@ -431,6 +430,26 @@ public class IngredientAmountManagerTest {
         manager.deleteIngredientFromRecipe(20l);
     }
     
+    @Test
+    public void deleteOK(){
+        Recipe recipe = newRecipe(null, "Recept", "Příprava", Duration.ofMinutes(25l));
+        rMan.createRecipe(recipe);
+        
+        Ingredient ingredient = newIngredient(null, "Cibule");
+        iMan.createIngredient(ingredient);
+        
+        IngredientAmount item = newItem(null, recipe.getId(), ingredient, "1 Ks");
+        manager.addIngredientInRecipe(item);
+        
+        manager.deleteIngredientFromRecipe(item.getId());
+        
+        try{
+            IngredientAmount dbValue = manager.getIngredientAmountById(item.getId());
+        }catch(EntityNotFoundException ex){
+            //OK
+        }
+    }
+    
     
     private static final Comparator<IngredientAmount> idComparator = new Comparator<IngredientAmount>() {
         @Override
@@ -439,7 +458,7 @@ public class IngredientAmountManagerTest {
         }
     };
     
-    private IngredientAmount newItem(Long id, Long recipeId, Ingredient ingredient, String amount){
+    private static IngredientAmount newItem(Long id, Long recipeId, Ingredient ingredient, String amount){
         IngredientAmount item = new IngredientAmount();
         
         item.setId(id);
@@ -450,7 +469,7 @@ public class IngredientAmountManagerTest {
         return item;
     }
     
-    private Ingredient newIngredient(Long id, String name) {
+    private static Ingredient newIngredient(Long id, String name) {
         Ingredient ingredient = new Ingredient();
         ingredient.setId(id);
         ingredient.setName(name);
@@ -458,7 +477,7 @@ public class IngredientAmountManagerTest {
         return ingredient;
     }
     
-    private Recipe newRecipe(Long id, String name, String instructions, Duration duration) {
+    private static Recipe newRecipe(Long id, String name, String instructions, Duration duration) {
         Recipe recipe = new Recipe();
         
         recipe.setId(id);

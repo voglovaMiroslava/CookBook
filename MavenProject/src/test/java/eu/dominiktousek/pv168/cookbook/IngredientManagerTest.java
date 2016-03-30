@@ -408,7 +408,7 @@ public class IngredientManagerTest {
         }
     };
     
-    private Ingredient newIngredient(Long id, String name) {
+    private static Ingredient newIngredient(Long id, String name) {
         Ingredient ingredient = new Ingredient();
         ingredient.setId(id);
         ingredient.setName(name);
