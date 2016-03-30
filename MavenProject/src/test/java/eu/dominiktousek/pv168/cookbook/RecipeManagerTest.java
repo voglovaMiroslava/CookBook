@@ -235,7 +235,37 @@ public class RecipeManagerTest {
         List<Recipe> controlValues = fullDatabase();
         List<Recipe> valuesFromManager = manager.searchByName(null);
     }
-
+    
+    @Test(expected = EntityNotFoundException.class)
+    public void removeNonExisting(){
+        manager.deleteRecipe(0L);
+    }
+    
+    @Test
+    public void removeExisting(){
+        Recipe rec = createRecipe("Polifka", "voda a syrup", Duration.ZERO);
+        manager.createRecipe(rec);
+        manager.deleteRecipe(rec.getId());
+        
+        List<Recipe> allfromDatabase = manager.getAllRecipes();
+        assertTrue("Recipe was not deleted from database.", allfromDatabase.isEmpty());       
+    }
+    
+    
+    @Test
+    public void removeWontCorruptData(){
+        List<Recipe> all = fullDatabase();
+        
+        Long idToRemove = all.get(0).getId();
+        all.remove(0);
+        manager.deleteRecipe(idToRemove);
+        
+        List<Recipe> allFromDatabase = manager.getAllRecipes();
+        
+        assertThat("After deletion, other data in database was corrupted.", all, is(equalTo(allFromDatabase)));
+    }
+    
+    
     private List<Recipe> fullDatabase() {
         Recipe rec1 = createRecipe("name", "instruction", Duration.ofMinutes(87L));
         Recipe rec2 = createRecipe("PotatoesSoup", "water and potatoes mixed together", Duration.ofHours(2L));
