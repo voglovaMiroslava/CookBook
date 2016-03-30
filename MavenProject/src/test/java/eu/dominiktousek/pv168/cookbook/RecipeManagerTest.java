@@ -159,6 +159,11 @@ public class RecipeManagerTest {
         Recipe other = manager.getRecipeById(rec.getId());
         assertTrue("GetRecipeById did not return same recipe.", checkAttributes(rec, other));
     }
+    
+    //SEARCH BY NULL ID IllegalArgumentException
+    
+    //Retrieve non existent
+    
 
     @Test
     public void durationSearchBothDurationsSet() {
