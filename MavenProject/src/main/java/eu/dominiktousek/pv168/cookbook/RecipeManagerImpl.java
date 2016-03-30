@@ -50,20 +50,18 @@ public class RecipeManagerImpl implements RecipeManager {
             } else {
                 statement.setNull(3, java.sql.Types.BIGINT);
             }
-            int count = statement.executeUpdate();
-            if (count != 1) {
-                throw new ServiceFailureException("No generated key retrieved from database!");
-            }
+            statement.executeUpdate();
 
-            ResultSet set = statement.getGeneratedKeys();
-            if (!set.next()) {
-                throw new ServiceFailureException("No generated key retrieved from database!");
+            try(ResultSet set = statement.getGeneratedKeys()){
+                if (!set.next()) {
+                    throw new ServiceFailureException("No generated key retrieved from database!");
+                }
+                Long id = set.getLong(1);
+                if (set.next()) {
+                    throw new ServiceFailureException("More than one record in database affected during one CREATE!");
+                }
+                recipe.setId(id);
             }
-            Long id = set.getLong(1);
-            if (set.next()) {
-                throw new ServiceFailureException("More than one record in database affected during one CREATE!");
-            }
-            recipe.setId(id);
 
         } catch (SQLException ex) {
             System.err.println(ex);
@@ -140,18 +138,19 @@ public class RecipeManagerImpl implements RecipeManager {
 
             statement.execute();
 
-            ResultSet set = statement.getResultSet();
-            if (set.next()) {
-                Recipe finded = fromResultSet(set);
-                
+            try(ResultSet set = statement.getResultSet()){
                 if (set.next()) {
-                    throw new ServiceFailureException(
-                            "More than one record retrieved from database for id=" + id);
+                    Recipe found = fromResultSet(set);
+
+                    if (set.next()) {
+                        throw new ServiceFailureException(
+                                "More than one record retrieved from database for id=" + id);
+                    }
+
+                    return found;
+                } else {
+                    throw new EntityNotFoundException("Entity with id:" + id + " was not found");
                 }
-                
-                return finded;
-            } else {
-                throw new EntityNotFoundException("Entity with id:" + id + " was not found");
             }
 
         } catch (SQLException ex) {
@@ -166,14 +165,15 @@ public class RecipeManagerImpl implements RecipeManager {
                 PreparedStatement ps = connection.prepareStatement(
                         "SELECT * FROM RECIPE")) {
 
-            ResultSet rs = ps.executeQuery();
-            List<Recipe> results = new ArrayList<>();
+            try(ResultSet rs = ps.executeQuery()){
+                List<Recipe> results = new ArrayList<>();
 
-            while (rs.next()) {
-                results.add(fromResultSet(rs));
+                while (rs.next()) {
+                    results.add(fromResultSet(rs));
+                }
+
+                return results;
             }
-
-            return results;
         } catch (SQLException e) {
             throw new ServiceFailureException("Error occurred while retrieving all recipes.", e);
         }
@@ -195,11 +195,39 @@ public class RecipeManagerImpl implements RecipeManager {
             throw new IllegalArgumentException("Name can't be null!");
         }
 
-        StringBuilder builder = new StringBuilder(60);
-        builder.append("SELECT * FROM Recipe WHERE 1=1");
-
         if (!name.isEmpty()) {
             name = "%" + name + "%";
+        }
+        
+        StringBuilder builder = prepareSearchQuery(name, durationFrom, durationTo, ingredients);
+        try (
+                Connection connection = this.dataSource.getConnection();
+                PreparedStatement statement = connection.prepareStatement(builder.toString())) {
+
+            if (!name.isEmpty()) {
+                statement.setString(1, name);
+            }
+            return parseRows(statement);
+
+        } catch (SQLException ex) {
+            System.err.println(ex);
+            throw new ServiceFailureException("Error occured while searching recipes", ex);
+        }
+    }
+
+    /**
+     * Prepares SQL query for search method
+     * 
+     * @param name Name of recipe
+     * @param durationFrom Minimal value of duration
+     * @param durationTo Maximal value of duration
+     * @param ingredients  List of ingredients in recipe
+     * @return StringBuilder with prepared query
+     */
+    private StringBuilder prepareSearchQuery(String name, Duration durationFrom, Duration durationTo, List<Ingredient> ingredients) {
+        StringBuilder builder = new StringBuilder(60);
+        builder.append("SELECT * FROM Recipe WHERE 1=1");
+        if (!name.isEmpty()) {
             builder.append(" AND NAME LIKE ?");
         }
         if (durationFrom != null) {
@@ -226,19 +254,7 @@ public class RecipeManagerImpl implements RecipeManager {
 
             builder.append(")");
         }
-        try (
-                Connection connection = this.dataSource.getConnection();
-                PreparedStatement statement = connection.prepareStatement(builder.toString())) {
-
-            if (!name.isEmpty()) {
-                statement.setString(1, name);
-            }
-            return parseRows(statement);
-
-        } catch (SQLException ex) {
-            System.err.println(ex);
-            throw new ServiceFailureException("Error occured while searching recipes", ex);
-        }
+        return builder;
     }
 
     /**
@@ -250,11 +266,7 @@ public class RecipeManagerImpl implements RecipeManager {
      * @throws SQLException
      */
     private static List<Recipe> parseRows(final PreparedStatement statement) throws SQLException {
-        boolean hasResult = statement.execute();
-        if (!hasResult) {
-            return new ArrayList<>();
-        } else {
-            ResultSet set = statement.getResultSet();
+        try(ResultSet set = statement.executeQuery()){
             ArrayList<Recipe> items = new ArrayList<>();
             while (set.next()) {
                 items.add(fromResultSet(set));
