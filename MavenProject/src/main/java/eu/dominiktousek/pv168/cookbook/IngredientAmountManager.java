@@ -12,10 +12,11 @@ public interface IngredientAmountManager {
     
     void updateIngredientInRecipe(IngredientAmount amount);
     
-    void deleteIngredientFromRecipe(IngredientAmount amount);
+    void deleteIngredientFromRecipe(Long Id);
     
     List<IngredientAmount> getIngredientsByRecipe(Long recipeId);
     
+    IngredientAmount getIngredientAmountById(Long id);
     //List<Recipe> getRecipesByIngredients(List<Ingredient> ingredients);
     
 }
