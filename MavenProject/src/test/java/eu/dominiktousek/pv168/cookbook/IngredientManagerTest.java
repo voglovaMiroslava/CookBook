@@ -100,24 +100,18 @@ public class IngredientManagerTest {
         assertThat(dbValue,is(not(sameInstance(ingredient))));
     }
     
-    @Test
+    @Test(expected = EntityNotFoundException.class)
     public void retrieveNonExistentFromNotEmptyDB(){
         Ingredient ingredient = newIngredient(null, "cibule");
         
         manager.createIngredient(ingredient);
         
         Ingredient dbValue = manager.getIngredientById(ingredient.getId()+20l);
-        
-        assertThat(dbValue,is(not(equalTo(ingredient))));
-        
-        assertThat(dbValue,is(not(sameInstance(ingredient))));
     }
     
-    @Test
+    @Test(expected = EntityNotFoundException.class)
     public void retrieveNonExistentFromEmptyDB(){        
         Ingredient dbValue = manager.getIngredientById(20l);
-        
-        assertThat(dbValue,is(equalTo(null)));
     }
     
     @Test
@@ -325,9 +319,12 @@ public class IngredientManagerTest {
         
         manager.deleteIngredient(ingredient.getId());
         
-        Ingredient nonExistentIngredient = manager.getIngredientById(id);
-        
-        assertThat("Ingredient exists after removing",nonExistentIngredient,is(equalTo(null)));
+        try{
+            Ingredient nonExistentIngredient = manager.getIngredientById(id);
+            fail();
+        }catch(EntityNotFoundException ex){
+            //OK
+        }
     }
     
     @Test
