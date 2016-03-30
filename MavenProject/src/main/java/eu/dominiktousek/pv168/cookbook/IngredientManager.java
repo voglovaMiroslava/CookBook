@@ -32,11 +32,11 @@ public interface IngredientManager {
      * Removes given ingredient from storage.
      * Given ingredient is <b>always validated</b> for null value of it self, null name, empty name and for null id value
      * 
-     * @param ingredient    Ingredient to be removed from storage
+     * @param id    Id of ingredient to be removed
      * @throws ServiceFailureException
      * @throws EntityNotFoundException
      */
-    void deleteIngredient(java.lang.Long id);
+    void deleteIngredient(Long id);
     
     /**
      * Retrieve Ingredient by given id. 
