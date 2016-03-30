@@ -91,8 +91,29 @@ public class IngredientAmountManagerImpl implements IngredientAmountManager {
 
     @Override
     public void deleteIngredientFromRecipe(Long amountId) {
-        //TODO: @tousekdominik
+        if(amountId==null){
+            throw new IllegalArgumentException("Id can't be null!");
+        }
         
+        try(
+                Connection connection = this.dataSource.getConnection();
+                PreparedStatement statement = connection.prepareStatement(
+                        "DELETE FROM INGREDIENTAMOUNT WHERE ID=?")
+                ){
+            
+            statement.setLong(1,amountId);
+            
+            int count = statement.executeUpdate();
+            if(count==0){
+                throw new EntityNotFoundException("Entity with id '"+ amountId +"' not found during remove.");
+            }
+            else if(count>1){
+                throw new ServiceFailureException("More than one record affected per one DELETE! Database is broken.");
+            }            
+        }catch(SQLException ex){
+            System.err.println(ex);
+            throw new ServiceFailureException("Error occured while removing IngredientAmount with id '" + amountId + "'",ex);
+        }
     }
 
     @Override
