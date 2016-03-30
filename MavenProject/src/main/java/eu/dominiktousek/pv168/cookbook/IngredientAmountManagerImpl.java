@@ -103,7 +103,7 @@ public class IngredientAmountManagerImpl implements IngredientAmountManager {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    private void validate(IngredientAmount amount, Boolean nonNullId) throws IllegalArgumentException {
+    private void validate(IngredientAmount amount, Boolean allowNullId) throws IllegalArgumentException {
         if (amount == null) {
             throw new IllegalArgumentException("IngredientAmount can't be null.");
         }
@@ -122,7 +122,7 @@ public class IngredientAmountManagerImpl implements IngredientAmountManager {
         if (amount.getAmount().isEmpty()) {
             throw new IllegalArgumentException("Amount in IngredientAmount can't be empty.");
         }
-        if (nonNullId && amount.getId() == null) {
+        if (!allowNullId && amount.getId() == null) {
             throw new IllegalArgumentException("IngredientAmount should have id.");
         }
     }
