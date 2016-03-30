@@ -3,10 +3,11 @@ package eu.dominiktousek.pv168.cookbook.daocontext;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
-import org.apache.derby.jdbc.ClientDataSource;
 
 /**
  * Class responsible for managing datasources
@@ -16,33 +17,28 @@ import org.apache.derby.jdbc.ClientDataSource;
 public class DBDataSourceFactory {
     private static final String CONFIG_FILE = "db-config.xml";
     
-    private static DataSource dataSource;
-    private static String dataSourceName;
-    private static int port;
-    private static String serverName;
-    private static String databaseName;
-    private static String user;
-    private static String password;
+    private static DataSourceConfiguration defaultDataSourceConfig;
+    private static final Map<String,DataSourceConfiguration> dataSources = new HashMap<>();
     
     public static DataSource getDataSource(){
-        if(dataSource==null){
+        if(defaultDataSourceConfig==null){
             loadConfig();
-            
-            ClientDataSource ds = new ClientDataSource ();
-            ds.setDataSourceName(dataSourceName);
-            ds.setPortNumber(port);
-            ds.setServerName(serverName);
-            ds.setDatabaseName(databaseName);
-            ds.setUser(user);
-            ds.setPassword(password);
-            
-            dataSource = ds;
         }
         
-        return dataSource;
+        return defaultDataSourceConfig.getDataSource();
+    }
+    
+    public static DataSource getDataSource(String dataSourceName){
+        if(dataSources.isEmpty()){
+            loadConfig();
+        }
+        
+        return dataSources.get(dataSourceName).getDataSource();
     }
     
     private static void loadConfig() throws ConfigLoadFailureException{
+        dataSources.clear();
+        
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         
         try {
@@ -52,62 +48,44 @@ public class DBDataSourceFactory {
             
             Element root = doc.getDocumentElement();
 
-            NodeList dataSources = root.getElementsByTagName("datasource");
-            if(dataSources.getLength()==0){
+            NodeList dataSrces = root.getElementsByTagName("datasource");
+            if(dataSrces.getLength()==0){
                 throw new ConfigLoadFailureException("Bad structure of config file!");
             }
-            Element ds = null;
-            for(int i=0;i<dataSources.getLength();i++){
-                Element el = (Element) dataSources.item(i);
-                if(el.hasAttribute("active") && el.getAttribute("active").equals("true")){
-                    ds = el;
+            Boolean activeFound = false;
+            for(int i=0;i<dataSrces.getLength();i++){
+                Element ds = (Element) dataSrces.item(i);
+                if(!ds.hasAttribute("type")){
+                    continue;
                 }
+                String dataSourceType = ds.getAttribute("type");
+                DataSourceConfiguration dsc = null;
+                switch(dataSourceType){
+                    case "derby-client" : {
+                        dsc = new ClientDataSourceConfigurationImpl();
+                        dsc.parse(ds);
+                        break;
+                    }
+                    case "embedded" : {
+                        dsc = new EmbeddedDataSourceConfigurationImpl();
+                        dsc.parse(ds);
+                    }
+                    default: break;
+                }
+                
+                if(dsc!=null){
+                    dataSources.put(dsc.getName(), dsc);
+                }
+                
+                if(ds.hasAttribute("active") && ds.getAttribute("active").equals("true")){
+                    activeFound = true;
+                    defaultDataSourceConfig = dsc;
+                }
+                
             }
-            if(ds==null){
+            if(!activeFound){
                 throw new ConfigLoadFailureException("None datasource marked as active!");
             }
-            
-            if(!ds.hasAttribute("name")){
-                throw new ConfigLoadFailureException("Bad structure of config file! Missing name atribute of dataSource");
-            }
-            dataSourceName = ds.getAttribute("name");
-            
-            NodeList ip = ds.getElementsByTagName("server-ip");
-            if(ip.getLength()!=1){
-                throw new ConfigLoadFailureException("Bad structure of config file! cannot parse <server-ip> or missing");
-            }
-            serverName = ip.item(0).getTextContent();
-            
-            NodeList prt = ds.getElementsByTagName("server-port");
-            if(prt.getLength()!=1){
-                throw new ConfigLoadFailureException("Bad structure of config file! cannot parse <server-port> or missing");
-            }
-            port = Integer.parseInt(prt.item(0).getTextContent());
-            
-            NodeList dbs = ds.getElementsByTagName("database");
-            if(dbs.getLength()!=1){
-                throw new ConfigLoadFailureException("Bad structure of config file! cannot parse <database> or missing");
-            }
-            Element db  = (Element) dbs.item(0);
-            
-            if(!db.hasAttribute("name")){
-                throw new ConfigLoadFailureException("Bad structure of config file! missing atribute name of <database>");
-            }
-            databaseName = db.getAttribute("name");
-            
-            NodeList usrs = db.getElementsByTagName("user");
-            if(usrs.getLength()!=1){
-                throw new ConfigLoadFailureException("Bad structure of config file! cannot parse <user> or missing");
-            }
-            Element usr  = (Element) usrs.item(0);
-            user = usr.getTextContent();
-            
-            NodeList pswds = db.getElementsByTagName("password");
-            if(dbs.getLength()!=1){
-                throw new ConfigLoadFailureException("Bad structure of config file! cannot parse <password> or missing");
-            }
-            Element pswd  = (Element) pswds.item(0);
-            password = pswd.getTextContent();
             
         } catch (ParserConfigurationException | org.xml.sax.SAXException | IOException ex) {
             Logger.getLogger(DBDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
