@@ -40,21 +40,22 @@ public class IngredientAmountManagerImpl implements IngredientAmountManager {
             ps.setString(3, amount.getAmount());
 
             ps.executeUpdate();
-            ResultSet key = ps.getGeneratedKeys();
+            
+            try (ResultSet key = ps.getGeneratedKeys()) {
 
-            if (key.next()) {
-                Long amountid = key.getLong(1);
-                amount.setId(amountid);
-            } else {
-                throw new ServiceFailureException(
-                        "IngredientAmount '" + amount + "' was not stored to database.");
+                if (key.next()) {
+                    Long amountid = key.getLong(1);
+                    amount.setId(amountid);
+                } else {
+                    throw new ServiceFailureException(
+                            "IngredientAmount '" + amount + "' was not stored to database.");
+                }
+
+                if (key.next()) {
+                    throw new ServiceFailureException(
+                            "More than one record of IngredientAmount created.");
+                }
             }
-
-            if (key.next()) {
-                throw new ServiceFailureException(
-                        "More than one record of IngredientAmount created.");
-            }
-
         } catch (SQLException ex) {
             throw new ServiceFailureException(
                     "Error occured while creating new IngredientAmount '" + amount + "'", ex);
@@ -94,65 +95,74 @@ public class IngredientAmountManagerImpl implements IngredientAmountManager {
 
     @Override
     public void deleteIngredientFromRecipe(Long amountId) {
-        if(amountId==null){
+        if (amountId == null) {
             throw new IllegalArgumentException("Id can't be null!");
         }
-        
-        try(
+
+        try (
                 Connection connection = this.dataSource.getConnection();
                 PreparedStatement statement = connection.prepareStatement(
-                        "DELETE FROM INGREDIENTAMOUNT WHERE ID=?")
-                ){
-            
-            statement.setLong(1,amountId);
-            
+                        "DELETE FROM INGREDIENTAMOUNT WHERE ID=?")) {
+
+            statement.setLong(1, amountId);
+
             int count = statement.executeUpdate();
-            if(count==0){
-                throw new EntityNotFoundException("Entity with id '"+ amountId +"' not found during remove.");
-            }
-            else if(count>1){
+            if (count == 0) {
+                throw new EntityNotFoundException("Entity with id '" + amountId + "' not found during remove.");
+            } else if (count > 1) {
                 throw new ServiceFailureException("More than one record affected per one DELETE! Database is broken.");
-            }            
-        }catch(SQLException ex){
+            }
+        } catch (SQLException ex) {
             System.err.println(ex);
-            throw new ServiceFailureException("Error occured while removing IngredientAmount with id '" + amountId + "'",ex);
+            throw new ServiceFailureException("Error occured while removing IngredientAmount with id '" + amountId + "'", ex);
         }
     }
 
     @Override
     public List<IngredientAmount> getIngredientsByRecipe(Long recipeId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(recipeId == null)
+            throw new IllegalArgumentException("ID of Recipe can't be null.");
+        
+        try (
+                Connection con = dataSource.getConnection();
+                PreparedStatement ps = con.prepareStatement(
+                        "SELECT * FROM IngredientAmount WHERE recipeid=?")) {
+
+            ps.setLong(1, recipeId);
+            return parseRows(ps);
+        } catch (SQLException ex) {
+            throw new ServiceFailureException(
+                    "Error occured while retrieving IngredientAmount by Recipe id '" + recipeId + "'", ex);
+        }
     }
-    
+
     @Override
     public IngredientAmount getIngredientAmountById(Long id) {
-        if(id==null){
+        if (id == null) {
             throw new IllegalArgumentException("Argument id can't be null");
         }
-        
-        try(
+
+        try (
                 Connection connection = this.dataSource.getConnection();
                 PreparedStatement statement = connection.prepareStatement(
-                        "SELECT * FROM INGREDIENTAMOUNT WHERE ID=?")
-                ){
-            
-            statement.setLong(1,id);
-            
-            try(ResultSet set = statement.executeQuery()){
-                if(set.next()){
+                        "SELECT * FROM INGREDIENTAMOUNT WHERE ID=?")) {
+
+            statement.setLong(1, id);
+
+            try (ResultSet set = statement.executeQuery()) {
+                if (set.next()) {
                     IngredientAmount rv = fromResultSet(set);
-                    if(set.next()){
-                        throw new ServiceFailureException("More than one record retrieved from database for id="+id);
+                    if (set.next()) {
+                        throw new ServiceFailureException("More than one record retrieved from database for id=" + id);
                     }
                     return rv;
-                }
-                else{
-                    throw new EntityNotFoundException("Requested entity with id '"+id+"' was not found!");
+                } else {
+                    throw new EntityNotFoundException("Requested entity with id '" + id + "' was not found!");
                 }
             }
-        }catch(SQLException ex){
+        } catch (SQLException ex) {
             System.err.println(ex);
-            throw new ServiceFailureException("Error occured while retrieving ingredient with id " + id,ex);
+            throw new ServiceFailureException("Error occured while retrieving ingredient with id " + id, ex);
         }
     }
 
@@ -179,42 +189,45 @@ public class IngredientAmountManagerImpl implements IngredientAmountManager {
             throw new IllegalArgumentException("IngredientAmount should have id.");
         }
     }
-    
+
     /**
-     * Executes given <b>PreparedStatement</b> and parses acquired <b>ResultSet</b> to list of <b>IngredientAmount</b>s
-     * 
-     * @param statement Statement to be executed 
-     * @return List of IngredientAmounts parsed from ResultSet of given statement
-     * @throws SQLException 
+     * Executes given <b>PreparedStatement</b> and parses acquired
+     * <b>ResultSet</b> to list of <b>IngredientAmount</b>s
+     *
+     * @param statement Statement to be executed
+     * @return List of IngredientAmounts parsed from ResultSet of given
+     * statement
+     * @throws SQLException
      */
     private List<IngredientAmount> parseRows(final PreparedStatement statement) throws SQLException {
-        try(ResultSet set = statement.executeQuery()){
+        try (ResultSet set = statement.executeQuery()) {
             ArrayList<IngredientAmount> items = new ArrayList<>();
 
-            while(set.next()){
+            while (set.next()) {
                 items.add(fromResultSet(set));
             }
             return items;
         }
     }
-    
+
     /**
-     * Parses one IngredientAmount object from ResultSet on actual cursor position
-     * 
+     * Parses one IngredientAmount object from ResultSet on actual cursor
+     * position
+     *
      * @param set ResultSet to load data from
      * @return Parsed IngredientAmount object
-     * @throws SQLException 
+     * @throws SQLException
      */
-    private IngredientAmount fromResultSet(ResultSet set) throws SQLException{
+    private IngredientAmount fromResultSet(ResultSet set) throws SQLException {
         IngredientAmount ingredientAmount = new IngredientAmount();
         ingredientAmount.setId(set.getLong("ID"));
         ingredientAmount.setRecipeId(set.getLong("RECIPEID"));
         ingredientAmount.setAmount(set.getString("AMOUNT"));
-        
+
         Long ingredientId = set.getLong("INGREDIENTID");
-        
+
         ingredientAmount.setIngredient(ingredientManager.getIngredientById(ingredientId));
-        
+
         return ingredientAmount;
     }
 }
