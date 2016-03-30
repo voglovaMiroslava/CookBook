@@ -24,7 +24,7 @@ public class IngredientAmountManagerImpl implements IngredientAmountManager {
     @Override
     public void addIngredientInRecipe(IngredientAmount amount)
             throws IllegalArgumentException, ServiceFailureException {
-        validate(amount, false);
+        validate(amount, true);
 
         try (
                 Connection con = dataSource.getConnection();
@@ -60,7 +60,7 @@ public class IngredientAmountManagerImpl implements IngredientAmountManager {
 
     @Override
     public void updateIngredientInRecipe(IngredientAmount amount) {
-        validate(amount, true);
+        validate(amount, false);
 
         try (
                 Connection con = dataSource.getConnection();
@@ -91,6 +91,7 @@ public class IngredientAmountManagerImpl implements IngredientAmountManager {
 
     @Override
     public void deleteIngredientFromRecipe(Long amountId) {
+        //TODO: @tousekdominik
         
     }
 
@@ -98,7 +99,8 @@ public class IngredientAmountManagerImpl implements IngredientAmountManager {
     public List<IngredientAmount> getIngredientsByRecipe(Long recipeId) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
+    @Override
     public IngredientAmount getIngredientAmountById(Long id) {
         throw new UnsupportedOperationException("Not supported yet.");
     }

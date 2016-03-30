@@ -36,7 +36,7 @@ public interface IngredientManager {
      * @throws ServiceFailureException
      * @throws EntityNotFoundException
      */
-    void removeIngredient(Ingredient ingredient);
+    void deleteIngredient(java.lang.Long id);
     
     /**
      * Retrieve Ingredient by given id. 

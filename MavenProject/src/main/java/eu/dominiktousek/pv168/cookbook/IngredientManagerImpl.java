@@ -98,26 +98,29 @@ public class IngredientManagerImpl implements IngredientManager {
     }
 
     @Override
-    public void removeIngredient(Ingredient ingredient) throws ServiceFailureException, EntityNotFoundException{
-        validate(ingredient);
+    public void deleteIngredient(Long id) throws ServiceFailureException, EntityNotFoundException{
+        if(id==null){
+            throw new IllegalArgumentException("Id can't be null!");
+        }
+        
         try(
                 Connection connection = this.dataSource.getConnection();
                 PreparedStatement statement = connection.prepareStatement(
                         "DELETE FROM Ingredient WHERE ID=?")
                 ){
             
-            statement.setLong(1,ingredient.getId());
+            statement.setLong(1,id);
             
             int count = statement.executeUpdate();
             if(count==0){
-                throw new EntityNotFoundException("Entity '"+ ingredient +"' not found during remove.");
+                throw new EntityNotFoundException("Entity with id '"+ id +"' not found during remove.");
             }
             else if(count>1){
                 throw new ServiceFailureException("More than one record affected per one DELETE! Database is broken.");
             }            
         }catch(SQLException ex){
             System.err.println(ex);
-            throw new ServiceFailureException("Error occured while removing ingredient '" + ingredient + "'",ex);
+            throw new ServiceFailureException("Error occured while removing ingredient with id '" + id + "'",ex);
         }
     }
 

@@ -323,7 +323,7 @@ public class IngredientManagerTest {
         assertThat("Ingredient id after creation can't be null.", id, is(not(equalTo(null))));
         assertThat("Ingredient name changed.",ingredient.getName(),is(equalTo("Cibule")));
         
-        manager.removeIngredient(ingredient);
+        manager.deleteIngredient(ingredient.getId());
         
         Ingredient nonExistentIngredient = manager.getIngredientById(id);
         
@@ -352,7 +352,7 @@ public class IngredientManagerTest {
         nonExistent.setId(Long.max(ing1.getId(), Long.max(ing2.getId(), ing3.getId()))+1);
         
         try{
-            manager.removeIngredient(nonExistent);
+            manager.deleteIngredient(nonExistent.getId());
         }catch(EntityNotFoundException ex){
             //ok
         }
@@ -382,12 +382,8 @@ public class IngredientManagerTest {
         
         List<Ingredient> all = manager.getAllIngredients();
         
-        Ingredient nonExistent = new Ingredient();
-        nonExistent.setName("Cibule");
-        nonExistent.setId(null);
-
         try{
-            manager.removeIngredient(nonExistent);
+            manager.deleteIngredient(null);
             fail();
         }catch(IllegalArgumentException ex){
             //ok

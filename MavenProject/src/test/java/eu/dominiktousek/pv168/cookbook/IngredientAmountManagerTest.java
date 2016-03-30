@@ -445,6 +445,7 @@ public class IngredientAmountManagerTest {
         
         try{
             IngredientAmount dbValue = manager.getIngredientAmountById(item.getId());
+            fail();
         }catch(EntityNotFoundException ex){
             //OK
         }
