@@ -1,6 +1,6 @@
-package eu.dominiktousek.pv168.cookbook;
+package eu.dominiktousek.pv168.cookbook.daocontext;
 
-import eu.dominiktousek.pv168.cookbook.daocontext.DBDataSourceFactory;
+import eu.dominiktousek.pv168.cookbook.ServiceFailureException;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,6 +24,10 @@ public class DBUtilDerbyImpl implements DBUtil {
     
     public DBUtilDerbyImpl() {
         this.source = DBDataSourceFactory.getDataSource();
+    }
+    
+    public DBUtilDerbyImpl(DataSource datasource) {
+        this.source = datasource;
     }
 
     @Override

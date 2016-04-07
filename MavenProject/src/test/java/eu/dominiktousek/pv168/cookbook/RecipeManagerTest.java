@@ -1,5 +1,6 @@
 package eu.dominiktousek.pv168.cookbook;
 
+import eu.dominiktousek.pv168.cookbook.daocontext.DBUtilDerbyImpl;
 import org.junit.*;
 
 import java.sql.SQLException;

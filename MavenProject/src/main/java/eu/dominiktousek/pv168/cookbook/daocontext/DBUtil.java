@@ -1,4 +1,4 @@
-package eu.dominiktousek.pv168.cookbook;
+package eu.dominiktousek.pv168.cookbook.daocontext;
 
 /**
  * Created by Miroslava Voglova

@@ -21,6 +21,7 @@ public class EmbeddedDataSourceConfigurationImpl implements DataSourceConfigurat
             EmbeddedDataSource ds = new EmbeddedDataSource ();
             ds.setDataSourceName(dataSourceName);
             ds.setDatabaseName(databaseName);
+            ds.setCreateDatabase("create");
             dataSource = ds;
         }
         return dataSource;
