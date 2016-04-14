@@ -34,7 +34,7 @@ public class RecipeManagerTest {
 
     @Before
     public void init() throws SQLException {
-        manager = new RecipeManagerImpl();
+        manager = new RecipeManagerImpl(DATA_SOURCE);
         DB_KEEPER.clearDatabase();
     }
 
