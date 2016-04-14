@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 public class RecipeManagerTest {
 
     private RecipeManager manager;
-     private static final DataSource DATA_SOURCE = DBDataSourceFactory.getDataSource("embedded-test");;
+    private static final DataSource DATA_SOURCE = DBDataSourceFactory.getDataSource("embedded-test");;
     private static final DBUtilDerbyImpl DB_KEEPER = new DBUtilDerbyImpl(DATA_SOURCE);
 
     @BeforeClass
