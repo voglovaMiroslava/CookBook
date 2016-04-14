@@ -21,27 +21,26 @@ public class IngredientAmountManagerTest {
     private IngredientAmountManager manager;
     private IngredientManager iMan;
     private RecipeManager rMan;
-    private static DataSource dataSource;
-    private static final DBUtilDerbyImpl dbKeeper = new DBUtilDerbyImpl();
+    private static final DataSource DATA_SOURCE = DBDataSourceFactory.getDataSource("embedded-test");
+    private static final DBUtilDerbyImpl DB_KEEPER = new DBUtilDerbyImpl(DATA_SOURCE);
   
     
     @BeforeClass
     public static void setUpClass(){
-        dataSource = DBDataSourceFactory.getDataSource();
-        dbKeeper.prepareDatabase();
+        DB_KEEPER.prepareDatabase();
     }
     
     @AfterClass
     public static void cleanUpClass(){
-        dbKeeper.clearDatabase();
+        DB_KEEPER.clearDatabase();
     }
     
     @Before
     public void setUp() throws SQLException { 
-        manager = new IngredientAmountManagerImpl(dataSource);
-        iMan = new IngredientManagerImpl(dataSource);
-        rMan = new RecipeManagerImpl(dataSource);
-        dbKeeper.clearDatabase();
+        manager = new IngredientAmountManagerImpl(DATA_SOURCE);
+        iMan = new IngredientManagerImpl(DATA_SOURCE);
+        rMan = new RecipeManagerImpl(DATA_SOURCE);
+        DB_KEEPER.clearDatabase();
     }
         
     //Creation tests

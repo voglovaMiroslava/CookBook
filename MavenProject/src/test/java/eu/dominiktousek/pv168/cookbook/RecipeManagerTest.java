@@ -1,5 +1,6 @@
 package eu.dominiktousek.pv168.cookbook;
 
+import eu.dominiktousek.pv168.cookbook.daocontext.DBDataSourceFactory;
 import eu.dominiktousek.pv168.cookbook.daocontext.DBUtilDerbyImpl;
 import org.junit.*;
 
@@ -7,6 +8,7 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.util.*;
 import java.util.regex.Pattern;
+import javax.sql.DataSource;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -17,7 +19,8 @@ import static org.junit.Assert.*;
 public class RecipeManagerTest {
 
     private RecipeManager manager;
-    private static final DBUtilDerbyImpl DB_KEEPER = new DBUtilDerbyImpl();
+     private static final DataSource DATA_SOURCE = DBDataSourceFactory.getDataSource("embedded-test");;
+    private static final DBUtilDerbyImpl DB_KEEPER = new DBUtilDerbyImpl(DATA_SOURCE);
 
     @BeforeClass
     public static void setUpClass() {

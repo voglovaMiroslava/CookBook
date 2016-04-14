@@ -21,25 +21,24 @@ import static org.junit.Assert.*;
 public class IngredientManagerTest {
     
     private IngredientManager manager;
-    private static DataSource dataSource;
-    private static final DBUtilDerbyImpl dbKeeper = new DBUtilDerbyImpl();
+    private static final DataSource DATA_SOURCE = DBDataSourceFactory.getDataSource("embedded-test");;
+    private static final DBUtilDerbyImpl DB_KEEPER = new DBUtilDerbyImpl(DATA_SOURCE);
   
     
     @BeforeClass
     public static void setUpClass(){
-        dataSource = DBDataSourceFactory.getDataSource();
-        dbKeeper.prepareDatabase();
+        DB_KEEPER.prepareDatabase();
     }
     
     @AfterClass
     public static void cleanUpClass(){
-        dbKeeper.clearDatabase();
+        DB_KEEPER.clearDatabase();
     }
     
     @Before
     public void setUp() throws SQLException { 
-        manager = new IngredientManagerImpl(dataSource);
-        dbKeeper.clearDatabase();
+        manager = new IngredientManagerImpl(DATA_SOURCE);
+        DB_KEEPER.clearDatabase();
     }
     
     //Creation tests
