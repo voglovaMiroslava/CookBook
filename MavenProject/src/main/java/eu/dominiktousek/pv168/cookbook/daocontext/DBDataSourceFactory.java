@@ -3,6 +3,8 @@ package eu.dominiktousek.pv168.cookbook.daocontext;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -15,7 +17,7 @@ import javax.sql.DataSource;
  * @author Dominik Tousek (422385)
  */
 public class DBDataSourceFactory {
-    private static final String CONFIG_FILE = "db-config.xml";
+    private static String CONFIG_FILE = "db-config.xml";
     
     private static DataSourceConfiguration defaultDataSourceConfig;
     private static final Map<String,DataSourceConfiguration> dataSources = new HashMap<>();
@@ -36,14 +38,22 @@ public class DBDataSourceFactory {
         return dataSources.get(dataSourceName).getDataSource();
     }
     
+    public static void setConfigFile(String path){
+        if(defaultDataSourceConfig!=null||!dataSources.isEmpty()){
+            throw new IllegalStateException("Operation cannot be called after initialization!");
+        }
+        
+        CONFIG_FILE = path;
+    }
+    
     private static void loadConfig() throws ConfigLoadFailureException{
         dataSources.clear();
         
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        
+        //URL url = DBDataSourceFactory.class.getClassLoader().getResource(CONFIG_FILE);
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
-            InputStream is = new FileInputStream(CONFIG_FILE);
+            InputStream is = new FileInputStream(CONFIG_FILE);/*url.openStream();*/
             Document doc = builder.parse(is);
             
             Element root = doc.getDocumentElement();

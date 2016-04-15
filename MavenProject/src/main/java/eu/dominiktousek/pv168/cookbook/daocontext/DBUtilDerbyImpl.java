@@ -2,9 +2,12 @@ package eu.dominiktousek.pv168.cookbook.daocontext;
 
 import eu.dominiktousek.pv168.cookbook.ServiceFailureException;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -66,9 +69,10 @@ public class DBUtilDerbyImpl implements DBUtil {
     }
     
     private String loadStringResource(String resourceName){
+        URL url = this.getClass().getClassLoader().getResource("sql/"+resourceName);
         try(BufferedReader bReader = new BufferedReader(
                 new InputStreamReader(
-                new FileInputStream("sql/"+resourceName)
+                url.openStream()
             ))){
             String line = bReader.readLine();
             StringBuilder builder = new StringBuilder();
