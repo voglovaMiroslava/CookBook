@@ -196,7 +196,7 @@ public class RecipeManagerImpl implements RecipeManager {
         }
 
         if (!name.isEmpty()) {
-            name = "%" + name + "%";
+            name = "%" + name.toLowerCase() + "%";
         }
         
         StringBuilder builder = prepareSearchQuery(name, durationFrom, durationTo, ingredients);
@@ -228,7 +228,7 @@ public class RecipeManagerImpl implements RecipeManager {
         StringBuilder builder = new StringBuilder(60);
         builder.append("SELECT * FROM Recipe WHERE 1=1");
         if (!name.isEmpty()) {
-            builder.append(" AND NAME LIKE ?");
+            builder.append(" AND LOWER(NAME) LIKE ?");
         }
         if (durationFrom != null) {
             builder.append(" AND DURATION > ");

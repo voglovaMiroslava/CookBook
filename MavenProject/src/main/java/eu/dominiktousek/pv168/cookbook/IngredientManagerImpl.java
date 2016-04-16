@@ -182,9 +182,9 @@ public class IngredientManagerImpl implements IngredientManager {
         try(
                 Connection connection = this.dataSource.getConnection();
                 PreparedStatement statement = connection.prepareStatement(
-                        "SELECT * FROM Ingredient WHERE NAME LIKE ?")
+                        "SELECT * FROM Ingredient WHERE LOWERNAME LIKE ?")
                 ){
-            String qName = "%"+name+"%";
+            String qName = "%"+name.toLowerCase()+"%";
             statement.setString(1, qName);
             
             return parseRows(statement);  
