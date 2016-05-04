@@ -297,7 +297,7 @@ public class RecipeManagerImpl implements RecipeManager {
 
     /**
      * Validates given recipe - tests for null values of object it self, name
-     * atribute, instructions atribute and an id. Name and instructions are also
+     * attribute, instructions attribute and an id. Name and instructions are also
      * tested for empty value.
      * <b>In case of validation fail, IllegalArgumentException is thrown.</b>
      *
@@ -310,7 +310,7 @@ public class RecipeManagerImpl implements RecipeManager {
 
     /**
      * Validates given recipe - tests for null values of object it self, name
-     * atribute, instructions atribute and optionally an id. Name and
+     * attribute, instructions attribute and optionally an id. Name and
      * instructions are also tested for empty value.
      * <b>In case of validation fail, IllegalArgumentException is thrown.</b>
      *
