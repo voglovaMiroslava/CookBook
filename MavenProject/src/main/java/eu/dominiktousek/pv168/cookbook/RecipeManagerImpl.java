@@ -11,6 +11,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of manager responsible for CRUD operations on Recipe. Based on
@@ -21,6 +23,7 @@ import javax.sql.DataSource;
 public class RecipeManagerImpl implements RecipeManager {
 
     private final DataSource dataSource;
+    final static Logger LOG = LoggerFactory.getLogger(RecipeManagerImpl.class);
 
     public RecipeManagerImpl() {
         this(DBDataSourceFactory.getDataSource());
@@ -34,7 +37,10 @@ public class RecipeManagerImpl implements RecipeManager {
     public void createRecipe(Recipe recipe) {
         validate(recipe, true);
 
+        LOG.debug("Creating new Recipe.");
+
         if (recipe.getId() != null) {
+            LOG.error("Error while creating Recipe. Id of recipe was already set!");
             throw new IllegalArgumentException("Id of recipe was already set!");
         }
 
@@ -52,19 +58,21 @@ public class RecipeManagerImpl implements RecipeManager {
             }
             statement.executeUpdate();
 
-            try(ResultSet set = statement.getGeneratedKeys()){
+            try (ResultSet set = statement.getGeneratedKeys()) {
                 if (!set.next()) {
+                    LOG.error("Error while creating Recipe. Recipe was not created.");
                     throw new ServiceFailureException("No generated key retrieved from database!");
                 }
                 Long id = set.getLong(1);
                 if (set.next()) {
+                    LOG.error("Error while creating Recipe. More than one Recipe created.");
                     throw new ServiceFailureException("More than one record in database affected during one CREATE!");
                 }
                 recipe.setId(id);
             }
 
         } catch (SQLException ex) {
-            System.err.println(ex);
+            LOG.error("SQL Exception occured while creating Recipe. Message of exception: {}", ex.getMessage());
             throw new ServiceFailureException("Error occured while creating new recipe '" + recipe + "'", ex);
         }
     }
@@ -72,6 +80,8 @@ public class RecipeManagerImpl implements RecipeManager {
     @Override
     public void updateRecipe(Recipe recipe) {
         validate(recipe);
+
+        LOG.debug("Updating new Recipe.");
 
         try (Connection connection = dataSource.getConnection();
                 PreparedStatement statement = connection.prepareStatement(
@@ -88,13 +98,16 @@ public class RecipeManagerImpl implements RecipeManager {
 
             int count = statement.executeUpdate();
             if (count == 0) {
+                LOG.error("Error while updating Recipe. Recipe to update was not found.");
                 throw new EntityNotFoundException("Recipe to update: " + recipe + "was not found.");
             }
             if (count > 1) {
+                LOG.error("Error while updating Recipe. More than one Recipe updated.");
                 throw new ServiceFailureException("More than one ( " + count + " ) recipe updated!");
             }
 
         } catch (SQLException e) {
+            LOG.error("SQL Exception occured while updating Recipe. Message of exception: {}", e.getMessage());
             throw new ServiceFailureException("Error occurred while updating recipe: " + recipe, e);
         }
 
@@ -103,8 +116,11 @@ public class RecipeManagerImpl implements RecipeManager {
     @Override
     public void deleteRecipe(Long id) {
         if (id == null) {
+            LOG.error("Error while deleting Recipe. Recipe id null.");
             throw new IllegalArgumentException("Id can't be null!");
         }
+
+        LOG.debug("Deleting Recipe.");
 
         try (Connection connection = dataSource.getConnection();
                 PreparedStatement statement = connection.prepareStatement(
@@ -113,12 +129,15 @@ public class RecipeManagerImpl implements RecipeManager {
             statement.setLong(1, id);
             int count = statement.executeUpdate();
             if (count == 0) {
+                LOG.error("Error while deleting Recipe. Recipe to delete was not found.");
                 throw new EntityNotFoundException("Recipe to delete with id: " + id + "was not found.");
             }
             if (count > 1) {
+                LOG.error("Error while deleting Recipe. Recipe to delete was not found.");
                 throw new ServiceFailureException("More than one ( " + count + " ) recipe deleted!");
             }
         } catch (SQLException e) {
+            LOG.error("SQL Exception occured while deleting Recipe. Message of exception: {}", e.getMessage());
             throw new ServiceFailureException("Error occurred while removing recipe with id " + id, e);
         }
     }
@@ -126,6 +145,7 @@ public class RecipeManagerImpl implements RecipeManager {
     @Override
     public Recipe getRecipeById(Long id) {
         if (id == null) {
+            LOG.error("Error while getting Recipe by id. Id is null.");
             throw new IllegalArgumentException("Argument id can't be null!");
         }
 
@@ -138,23 +158,25 @@ public class RecipeManagerImpl implements RecipeManager {
 
             statement.execute();
 
-            try(ResultSet set = statement.getResultSet()){
+            try (ResultSet set = statement.getResultSet()) {
                 if (set.next()) {
                     Recipe found = fromResultSet(set);
 
                     if (set.next()) {
+                        LOG.error("Error while getting Recipe by id. More than one record retrieved from database for id {}", id);
                         throw new ServiceFailureException(
                                 "More than one record retrieved from database for id=" + id);
                     }
 
                     return found;
                 } else {
+                    LOG.error("Error while getting Recipe by id. Entity with id {} was not found", id);
                     throw new EntityNotFoundException("Entity with id:" + id + " was not found");
                 }
             }
 
         } catch (SQLException ex) {
-            System.err.println(ex);
+            LOG.error("SQL Exception occured while getting Recipe by id {}. Message of exception: {}", id, ex.getMessage());
             throw new ServiceFailureException("Error occured while retrieving recipe with id " + id, ex);
         }
     }
@@ -165,7 +187,7 @@ public class RecipeManagerImpl implements RecipeManager {
                 PreparedStatement ps = connection.prepareStatement(
                         "SELECT * FROM RECIPE")) {
 
-            try(ResultSet rs = ps.executeQuery()){
+            try (ResultSet rs = ps.executeQuery()) {
                 List<Recipe> results = new ArrayList<>();
 
                 while (rs.next()) {
@@ -175,6 +197,7 @@ public class RecipeManagerImpl implements RecipeManager {
                 return results;
             }
         } catch (SQLException e) {
+            LOG.error("SQL Exception occured while getting all Recipes. Message of exception: {}", e.getMessage());
             throw new ServiceFailureException("Error occurred while retrieving all recipes.", e);
         }
     }
@@ -192,13 +215,14 @@ public class RecipeManagerImpl implements RecipeManager {
     @Override
     public List<Recipe> search(String name, Duration durationFrom, Duration durationTo, List<Ingredient> ingredients) {
         if (name == null) {
+            LOG.error("error while searching recipe. Name can not be null (can be empty).");
             throw new IllegalArgumentException("Name can't be null!");
         }
 
         if (!name.isEmpty()) {
             name = "%" + name.toLowerCase() + "%";
         }
-        
+
         StringBuilder builder = prepareSearchQuery(name, durationFrom, durationTo, ingredients);
         try (
                 Connection connection = this.dataSource.getConnection();
@@ -210,18 +234,18 @@ public class RecipeManagerImpl implements RecipeManager {
             return parseRows(statement);
 
         } catch (SQLException ex) {
-            System.err.println(ex);
+            LOG.error("SQL Exception occured while searching Recipes. Message of exception: {}", ex.getMessage());
             throw new ServiceFailureException("Error occured while searching recipes", ex);
         }
     }
 
     /**
      * Prepares SQL query for search method
-     * 
+     *
      * @param name Name of recipe
      * @param durationFrom Minimal value of duration
      * @param durationTo Maximal value of duration
-     * @param ingredients  List of ingredients in recipe
+     * @param ingredients List of ingredients in recipe
      * @return StringBuilder with prepared query
      */
     private StringBuilder prepareSearchQuery(String name, Duration durationFrom, Duration durationTo, List<Ingredient> ingredients) {
@@ -266,7 +290,7 @@ public class RecipeManagerImpl implements RecipeManager {
      * @throws SQLException
      */
     private static List<Recipe> parseRows(final PreparedStatement statement) throws SQLException {
-        try(ResultSet set = statement.executeQuery()){
+        try (ResultSet set = statement.executeQuery()) {
             ArrayList<Recipe> items = new ArrayList<>();
             while (set.next()) {
                 items.add(fromResultSet(set));
@@ -297,8 +321,8 @@ public class RecipeManagerImpl implements RecipeManager {
 
     /**
      * Validates given recipe - tests for null values of object it self, name
-     * attribute, instructions attribute and an id. Name and instructions are also
-     * tested for empty value.
+     * attribute, instructions attribute and an id. Name and instructions are
+     * also tested for empty value.
      * <b>In case of validation fail, IllegalArgumentException is thrown.</b>
      *
      * @param recipe recipe object to be tested
@@ -326,22 +350,29 @@ public class RecipeManagerImpl implements RecipeManager {
         instructions - can't be null or empty
         duration - could be null
          */
+        LOG.debug("Validating Recipe object.");
         if (recipe == null) {
+            LOG.error("Object not valid. Object Recipe was null.");
             throw new IllegalArgumentException("Null recipe entity supplied!");
         }
         if (recipe.getName() == null) {
+            LOG.error("Object not valid. Name is null.");
             throw new IllegalArgumentException("Name of recipe can't be null!");
         }
         if (recipe.getName().isEmpty()) {
+            LOG.error("Object not valid. Name is empty.");
             throw new IllegalArgumentException("Name of recipe can't be empty!");
         }
         if (recipe.getInstructions() == null) {
+            LOG.error("Object not valid. Instructions are null.");
             throw new IllegalArgumentException("Instructions of recipe can't be null!");
         }
         if (recipe.getInstructions().isEmpty()) {
+            LOG.error("Object not valid. Instructions are empty.");
             throw new IllegalArgumentException("Instructions of recipe can't be empty!");
         }
         if (!allowNullIdentity && recipe.getId() == null) {
+            LOG.error("Object not valid. Id of Recipe is null.");
             throw new IllegalArgumentException("Id of recipe can't be null!");
         }
     }
