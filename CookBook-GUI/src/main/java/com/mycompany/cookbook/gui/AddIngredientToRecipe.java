@@ -77,7 +77,8 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
         setTitle("Add ingredient");
         setMinimumSize(new java.awt.Dimension(433, 229));
 
-        jLabel1.setText("Search:");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle"); // NOI18N
+        jLabel1.setText(bundle.getString("search")); // NOI18N
 
         jTextField2.setToolTipText("Search existing ingredient");
 
@@ -88,17 +89,17 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
 
         label4.setText("label4");
 
-        jLabel5.setText("Amount:");
+        jLabel5.setText(bundle.getString("amount")); // NOI18N
 
-        jButton2.setText("CREATE NEW");
+        jButton2.setText(bundle.getString("createNew")); // NOI18N
 
-        jLabel6.setText("OR");
+        jLabel6.setText(bundle.getString("or")); // NOI18N
 
         jTextField1.setToolTipText("For exampe: '1 Ks'");
 
-        jButton1.setText("CANCEL");
+        jButton1.setText(bundle.getString("cancel")); // NOI18N
 
-        jButton3.setText("OK");
+        jButton3.setText(bundle.getString("ok")); // NOI18N
 
         javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);
         panel1.setLayout(panel1Layout);

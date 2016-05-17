@@ -69,7 +69,9 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
         setMinimumSize(new java.awt.Dimension(500, 280));
         setPreferredSize(new java.awt.Dimension(500, 280));
 
-        jLabel1.setText("Search:");
+        jLabel1.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle"); // NOI18N
+        jLabel1.setText(bundle.getString("search")); // NOI18N
 
         jTextField2.setToolTipText("Type here your search query");
 
@@ -86,11 +88,14 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(jList2);
 
-        jButton1.setText("Add to filter");
+        jButton1.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        jButton1.setText(bundle.getString("addToFilter")); // NOI18N
 
-        jButton2.setText("OK");
+        jButton2.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        jButton2.setText(bundle.getString("ok")); // NOI18N
 
-        jButton3.setText("CANCEL");
+        jButton3.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        jButton3.setText(bundle.getString("cancel")); // NOI18N
 
         javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);
         panel1.setLayout(panel1Layout);
@@ -110,8 +115,8 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE))
                     .addGroup(panel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(4, 4, 4)
                         .addComponent(jTextField2)))
                 .addContainerGap())
         );
@@ -124,7 +129,7 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
                     .addComponent(jScrollPane1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)

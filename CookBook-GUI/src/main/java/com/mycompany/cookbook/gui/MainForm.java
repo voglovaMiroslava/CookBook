@@ -91,22 +91,30 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
         jScrollPane2.setViewportView(jTable2);
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle"); // NOI18N
+        if (jTable2.getColumnModel().getColumnCount() > 0) {
+            jTable2.getColumnModel().getColumn(0).setHeaderValue(bundle.getString("ingredientName")); // NOI18N
+        }
 
-        jButton5.setText("REMOVE INGREDIENT");
+        jButton5.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        jButton5.setText(bundle.getString("removeIngredient")); // NOI18N
 
-        jButton6.setText("EDIT INGREDIENT");
+        jButton6.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        jButton6.setText(bundle.getString("editIngredient")); // NOI18N
         jButton6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton6ActionPerformed(evt);
             }
         });
 
-        jButton7.setText("SEARCH");
+        jButton7.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        jButton7.setText(bundle.getString("search")); // NOI18N
 
-        jButton8.setText("ADD NEW");
+        jButton8.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        jButton8.setText(bundle.getString("addNew")); // NOI18N
 
         jLabel2.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jLabel2.setText("Search by name:");
+        jLabel2.setText(bundle.getString("searchByName")); // NOI18N
 
         jTextField2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -128,7 +136,7 @@ public class MainForm extends javax.swing.JFrame {
                         .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 293, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 296, Short.MAX_VALUE)
                         .addComponent(jButton8)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton6)
@@ -151,15 +159,16 @@ public class MainForm extends javax.swing.JFrame {
                     .addComponent(jLabel2)
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 637, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 635, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         jPanel2Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButton5, jButton6, jButton7, jButton8, jTextField2});
 
-        jTabbedPane1.addTab("INGREDIENTS", jPanel2);
+        jTabbedPane1.addTab(bundle.getString("ingredients"), jPanel2); // NOI18N
 
-        jButton3.setText("SHOW DETAIL");
+        jButton3.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        jButton3.setText(bundle.getString("showDetail")); // NOI18N
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -183,26 +192,35 @@ public class MainForm extends javax.swing.JFrame {
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         jTable1.setAutoscrolls(false);
         jScrollPane1.setViewportView(jTable1);
+        if (jTable1.getColumnModel().getColumnCount() > 0) {
+            jTable1.getColumnModel().getColumn(0).setHeaderValue(bundle.getString("name")); // NOI18N
+            jTable1.getColumnModel().getColumn(1).setHeaderValue(bundle.getString("ingredients")); // NOI18N
+            jTable1.getColumnModel().getColumn(2).setHeaderValue(bundle.getString("description")); // NOI18N
+            jTable1.getColumnModel().getColumn(3).setHeaderValue(bundle.getString("duration")); // NOI18N
+        }
 
-        jButton1.setText("REMOVE RECIPE");
+        jButton1.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        jButton1.setText(bundle.getString("removeRecipe")); // NOI18N
 
-        jButton4.setText("ADD NEW RECIPE");
+        jButton4.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        jButton4.setText(bundle.getString("addNewRecipe")); // NOI18N
 
         jPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jLabel5.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jLabel5.setText("To");
+        jLabel5.setText(bundle.getString("to")); // NOI18N
 
         jLabel4.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jLabel4.setText("From");
+        jLabel4.setText(bundle.getString("from")); // NOI18N
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Minute(s)", "Hour(s)", "Day(s)" }));
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { bundle.getString("minute(s)"), bundle.getString("hour(s)"), bundle.getString("day(s)") }));
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Minute(s)", "Hour(s)", "Day(s)" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { bundle.getString("minute(s)"), bundle.getString("hour(s)"), bundle.getString("day(s)") }));
 
         jSpinner1.setModel(new javax.swing.SpinnerNumberModel());
 
-        jButton2.setText("SEARCH");
+        jButton2.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        jButton2.setText(bundle.getString("search")); // NOI18N
 
         jTextField3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -210,10 +228,11 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
-        jButton9.setText("Select Ingredients");
+        jButton9.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        jButton9.setText(bundle.getString("selectIngredients")); // NOI18N
 
         jCheckBox1.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jCheckBox1.setText("Search by duration:");
+        jCheckBox1.setText(bundle.getString("searchByDuration")); // NOI18N
         jCheckBox1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -222,10 +241,10 @@ public class MainForm extends javax.swing.JFrame {
         });
 
         jCheckBox2.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jCheckBox2.setText("Search by ingredients:");
+        jCheckBox2.setText(bundle.getString("searchByIngredients")); // NOI18N
 
         jCheckBox3.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jCheckBox3.setText("Search by name:");
+        jCheckBox3.setText(bundle.getString("searchByName")); // NOI18N
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -258,7 +277,7 @@ public class MainForm extends javax.swing.JFrame {
                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton9)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 215, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 210, Short.MAX_VALUE)
                         .addComponent(jButton2))))
         );
 
@@ -273,25 +292,23 @@ public class MainForm extends javax.swing.JFrame {
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jCheckBox3)
                             .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(5, 5, 5)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(8, 8, 8)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSpinner1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(jLabel4)
                                 .addComponent(jLabel5)
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(jCheckBox1))
-                            .addComponent(jSpinner3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jSpinner3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(5, 5, 5)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jButton9)
                             .addComponent(jCheckBox2))
                         .addContainerGap(24, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addComponent(jButton2)
-                        .addGap(0, 0, 0))))
+                    .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING)))
         );
 
         jPanel3Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButton2, jTextField1});
@@ -336,36 +353,34 @@ public class MainForm extends javax.swing.JFrame {
                             .addComponent(jButton3)))
                     .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(14, 14, 14)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButton1, jButton3, jButton4});
-
-        jTabbedPane1.addTab("RECIPES", jPanel1);
+        jTabbedPane1.addTab(bundle.getString("recipes"), jPanel1); // NOI18N
 
         jTabbedPane1.setSelectedIndex(1);
 
         jMenuBar1.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 
-        jMenu1.setText("File");
+        jMenu1.setText(bundle.getString("file")); // NOI18N
         jMenu1.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 
-        jMenuItem6.setText("Show all recipes");
+        jMenuItem6.setText(bundle.getString("showAllRecipes")); // NOI18N
         jMenu1.add(jMenuItem6);
 
-        jMenuItem2.setText("Show all Ingredients");
+        jMenuItem2.setText(bundle.getString("showAllIngredients")); // NOI18N
         jMenu1.add(jMenuItem2);
 
-        jMenuItem1.setText("Exit program");
+        jMenuItem1.setText(bundle.getString("exitProgram")); // NOI18N
         jMenu1.add(jMenuItem1);
 
         jMenuBar1.add(jMenu1);
 
-        jMenu2.setText("Edit");
+        jMenu2.setText(bundle.getString("edit")); // NOI18N
         jMenu2.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
 
-        jMenuItem3.setText("Add new Recipe");
+        jMenuItem3.setText(bundle.getString("addNewRecipe")); // NOI18N
         jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem3ActionPerformed(evt);
@@ -373,7 +388,7 @@ public class MainForm extends javax.swing.JFrame {
         });
         jMenu2.add(jMenuItem3);
 
-        jMenuItem4.setText("Add new Ingredient");
+        jMenuItem4.setText(bundle.getString("addNewIngredient")); // NOI18N
         jMenu2.add(jMenuItem4);
 
         jMenuBar1.add(jMenu2);

@@ -38,13 +38,15 @@ public class AddEditIngredient extends javax.swing.JFrame {
         setPreferredSize(new java.awt.Dimension(453, 95));
         setResizable(false);
 
-        jLabel1.setText("Name: ");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle"); // NOI18N
+        jLabel1.setText(bundle.getString("name")); // NOI18N
+        jLabel1.setToolTipText("");
 
-        jTextField1.setText("jTextField1");
+        jTextField1.setText("Some text");
 
-        jButton2.setText("CANCEL");
+        jButton2.setText(bundle.getString("cancel")); // NOI18N
 
-        jButton3.setText("OK");
+        jButton3.setText(bundle.getString("ok")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -58,7 +60,7 @@ public class AddEditIngredient extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jTextField1))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 286, Short.MAX_VALUE)
+                        .addGap(0, 294, Short.MAX_VALUE)
                         .addComponent(jButton2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton3)))
