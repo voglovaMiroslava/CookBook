@@ -13,14 +13,6 @@ public class IngredientTableModel extends AbstractTableModel{
     
     private final List<Ingredient> data = new LinkedList<>();
     
-    public IngredientTableModel(){
-        super();
-        Ingredient in = new Ingredient();
-        in.setId(1l);
-        in.setName("Cibule");
-        data.add(in);
-    }
-    
     @Override
     public int getRowCount() {
         return data.size();
