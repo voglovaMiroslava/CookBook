@@ -63,10 +63,10 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
         label3 = new java.awt.Label();
         label4 = new java.awt.Label();
         jLabel5 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
+        buttCreateIng = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        buttCancel = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
 
         jTextArea1.setColumns(20);
@@ -90,13 +90,23 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
 
         jLabel5.setText(bundle.getString("amount")); // NOI18N
 
-        jButton2.setText(bundle.getString("createNew")); // NOI18N
+        buttCreateIng.setText(bundle.getString("createNew")); // NOI18N
+        buttCreateIng.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttCreateIngActionPerformed(evt);
+            }
+        });
 
         jLabel6.setText(bundle.getString("or")); // NOI18N
 
         jTextField1.setToolTipText("For exampe: '1 Ks'");
 
-        jButton1.setText(bundle.getString("cancel")); // NOI18N
+        buttCancel.setText(bundle.getString("cancel")); // NOI18N
+        buttCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttCancelActionPerformed(evt);
+            }
+        });
 
         jButton3.setText(bundle.getString("ok")); // NOI18N
 
@@ -114,7 +124,7 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(buttCreateIng, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 393, Short.MAX_VALUE)
                     .addGroup(panel1Layout.createSequentialGroup()
                         .addComponent(jLabel5)
@@ -122,7 +132,7 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
                         .addComponent(jTextField1))
                     .addGroup(panel1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton1)
+                        .addComponent(buttCancel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
@@ -134,7 +144,7 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
                 .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
-                    .addComponent(jButton2)
+                    .addComponent(buttCreateIng)
                     .addComponent(jLabel6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE)
@@ -144,7 +154,7 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
+                    .addComponent(buttCancel)
                     .addComponent(jButton3))
                 .addContainerGap())
         );
@@ -168,6 +178,16 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void buttCreateIngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttCreateIngActionPerformed
+        javax.swing.JFrame editIng = new AddEditIngredient();
+        editIng.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        editIng.setVisible(true);
+    }//GEN-LAST:event_buttCreateIngActionPerformed
+
+    private void buttCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttCancelActionPerformed
+        super.dispose();
+    }//GEN-LAST:event_buttCancelActionPerformed
 
     /**
      * @param args the command line arguments
@@ -212,8 +232,8 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton buttCancel;
+    private javax.swing.JButton buttCreateIng;
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel5;

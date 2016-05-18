@@ -29,7 +29,7 @@ public class AddEditIngredient extends javax.swing.JFrame {
 
         jLabel1 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
-        jButton2 = new javax.swing.JButton();
+        buttCancel = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -44,7 +44,12 @@ public class AddEditIngredient extends javax.swing.JFrame {
 
         jTextField1.setText("Some text");
 
-        jButton2.setText(bundle.getString("cancel")); // NOI18N
+        buttCancel.setText(bundle.getString("cancel")); // NOI18N
+        buttCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttCancelActionPerformed(evt);
+            }
+        });
 
         jButton3.setText(bundle.getString("ok")); // NOI18N
 
@@ -61,7 +66,7 @@ public class AddEditIngredient extends javax.swing.JFrame {
                         .addComponent(jTextField1))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 294, Short.MAX_VALUE)
-                        .addComponent(jButton2)
+                        .addComponent(buttCancel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton3)))
                 .addContainerGap())
@@ -75,13 +80,17 @@ public class AddEditIngredient extends javax.swing.JFrame {
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
+                    .addComponent(buttCancel)
                     .addComponent(jButton3))
                 .addContainerGap(20, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void buttCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttCancelActionPerformed
+         super.dispose();
+    }//GEN-LAST:event_buttCancelActionPerformed
 
     /**
      * @param args the command line arguments
@@ -120,7 +129,7 @@ public class AddEditIngredient extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton buttCancel;
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField jTextField1;

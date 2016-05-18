@@ -32,10 +32,10 @@ public class MainForm extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
-        jButton7 = new javax.swing.JButton();
-        jButton8 = new javax.swing.JButton();
+        buttRemoveIng = new javax.swing.JButton();
+        buttEditIng = new javax.swing.JButton();
+        buttSearchIng = new javax.swing.JButton();
+        buttAddIng = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jTextField2 = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
@@ -52,7 +52,7 @@ public class MainForm extends javax.swing.JFrame {
         jSpinner3 = new javax.swing.JSpinner();
         jComboBox1 = new javax.swing.JComboBox<>();
         jSpinner1 = new javax.swing.JSpinner();
-        jButton2 = new javax.swing.JButton();
+        buttSearchRec = new javax.swing.JButton();
         jTextField3 = new javax.swing.JTextField();
         buttSelectIng = new javax.swing.JButton();
         jCheckBox1 = new javax.swing.JCheckBox();
@@ -96,22 +96,27 @@ public class MainForm extends javax.swing.JFrame {
             jTable2.getColumnModel().getColumn(0).setHeaderValue(bundle.getString("ingredientName")); // NOI18N
         }
 
-        jButton5.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jButton5.setText(bundle.getString("removeIngredient")); // NOI18N
+        buttRemoveIng.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        buttRemoveIng.setText(bundle.getString("removeIngredient")); // NOI18N
 
-        jButton6.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jButton6.setText(bundle.getString("editIngredient")); // NOI18N
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
+        buttEditIng.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        buttEditIng.setText(bundle.getString("editIngredient")); // NOI18N
+        buttEditIng.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
+                buttEditIngActionPerformed(evt);
             }
         });
 
-        jButton7.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jButton7.setText(bundle.getString("search")); // NOI18N
+        buttSearchIng.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        buttSearchIng.setText(bundle.getString("search")); // NOI18N
 
-        jButton8.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jButton8.setText(bundle.getString("addNew")); // NOI18N
+        buttAddIng.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        buttAddIng.setText(bundle.getString("addNew")); // NOI18N
+        buttAddIng.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttAddIngActionPerformed(evt);
+            }
+        });
 
         jLabel2.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         jLabel2.setText(bundle.getString("searchByName")); // NOI18N
@@ -135,27 +140,27 @@ public class MainForm extends javax.swing.JFrame {
                         .addGap(1, 1, 1)
                         .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(buttSearchIng, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 296, Short.MAX_VALUE)
-                        .addComponent(jButton8)
+                        .addComponent(buttAddIng)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton6)
+                        .addComponent(buttEditIng)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton5)))
+                        .addComponent(buttRemoveIng)))
                 .addContainerGap())
         );
 
-        jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButton5, jButton6, jButton8});
+        jPanel2Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {buttAddIng, buttEditIng, buttRemoveIng});
 
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(33, 33, 33)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton5)
-                    .addComponent(jButton6)
-                    .addComponent(jButton7)
-                    .addComponent(jButton8)
+                    .addComponent(buttRemoveIng)
+                    .addComponent(buttEditIng)
+                    .addComponent(buttSearchIng)
+                    .addComponent(buttAddIng)
                     .addComponent(jLabel2)
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -163,12 +168,17 @@ public class MainForm extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jPanel2Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButton5, jButton6, jButton7, jButton8, jTextField2});
+        jPanel2Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {buttAddIng, buttEditIng, buttRemoveIng, buttSearchIng, jTextField2});
 
         tabbedPanel.addTab(bundle.getString("ingredients"), jPanel2); // NOI18N
 
         buttShowDetail.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         buttShowDetail.setText(bundle.getString("showDetail")); // NOI18N
+        buttShowDetail.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttShowDetailActionPerformed(evt);
+            }
+        });
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -204,6 +214,11 @@ public class MainForm extends javax.swing.JFrame {
 
         buttAddRecipe.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         buttAddRecipe.setText(bundle.getString("addNewRecipe")); // NOI18N
+        buttAddRecipe.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttAddRecipeActionPerformed(evt);
+            }
+        });
 
         jPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
@@ -219,8 +234,8 @@ public class MainForm extends javax.swing.JFrame {
 
         jSpinner1.setModel(new javax.swing.SpinnerNumberModel());
 
-        jButton2.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jButton2.setText(bundle.getString("search")); // NOI18N
+        buttSearchRec.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        buttSearchRec.setText(bundle.getString("search")); // NOI18N
 
         jTextField3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -283,7 +298,7 @@ public class MainForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(buttSelectIng)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 210, Short.MAX_VALUE)
-                        .addComponent(jButton2))))
+                        .addComponent(buttSearchRec))))
         );
 
         jPanel3Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jTextField1, jTextField3});
@@ -313,10 +328,10 @@ public class MainForm extends javax.swing.JFrame {
                             .addComponent(buttSelectIng)
                             .addComponent(jCheckBox2))
                         .addContainerGap(24, Short.MAX_VALUE))
-                    .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING)))
+                    .addComponent(buttSearchRec, javax.swing.GroupLayout.Alignment.TRAILING)))
         );
 
-        jPanel3Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButton2, jTextField1});
+        jPanel3Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {buttSearchRec, jTextField1});
 
         jPanel3Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jLabel4, jLabel5});
 
@@ -454,9 +469,9 @@ public class MainForm extends javax.swing.JFrame {
         editRec.setVisible(true);
     }//GEN-LAST:event_menuAddRecipeActionPerformed
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+    private void buttEditIngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttEditIngActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton6ActionPerformed
+    }//GEN-LAST:event_buttEditIngActionPerformed
 
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
         // TODO add your handling code here:
@@ -497,6 +512,24 @@ public class MainForm extends javax.swing.JFrame {
         ingFilter.setVisible(true);
     }//GEN-LAST:event_buttSelectIngActionPerformed
 
+    private void buttShowDetailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttShowDetailActionPerformed
+        javax.swing.JFrame recDetail = new RecipeDetail();
+        recDetail.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        recDetail.setVisible(true);
+    }//GEN-LAST:event_buttShowDetailActionPerformed
+
+    private void buttAddRecipeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttAddRecipeActionPerformed
+        javax.swing.JFrame editRec = new EditRecipe();
+        editRec.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        editRec.setVisible(true);
+    }//GEN-LAST:event_buttAddRecipeActionPerformed
+
+    private void buttAddIngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttAddIngActionPerformed
+        javax.swing.JFrame editIng = new AddEditIngredient();
+        editIng.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        editIng.setVisible(true);
+    }//GEN-LAST:event_buttAddIngActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -531,16 +564,16 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttAddIng;
     private javax.swing.JButton buttAddRecipe;
+    private javax.swing.JButton buttEditIng;
+    private javax.swing.JButton buttRemoveIng;
+    private javax.swing.JButton buttSearchIng;
+    private javax.swing.JButton buttSearchRec;
     private javax.swing.JButton buttSelectIng;
     private javax.swing.JButton buttShowDetail;
     private javax.swing.Box.Filler filler2;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
-    private javax.swing.JButton jButton8;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JCheckBox jCheckBox3;

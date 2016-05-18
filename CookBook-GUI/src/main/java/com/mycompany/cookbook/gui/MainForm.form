@@ -177,13 +177,13 @@
                               <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
                               <Component id="jTextField2" min="-2" pref="158" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jButton7" min="-2" pref="90" max="-2" attributes="0"/>
+                              <Component id="buttSearchIng" min="-2" pref="90" max="-2" attributes="0"/>
                               <EmptySpace pref="296" max="32767" attributes="0"/>
-                              <Component id="jButton8" linkSize="12" min="-2" max="-2" attributes="0"/>
+                              <Component id="buttAddIng" linkSize="12" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="jButton6" linkSize="12" min="-2" max="-2" attributes="0"/>
+                              <Component id="buttEditIng" linkSize="12" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="jButton5" linkSize="12" min="-2" max="-2" attributes="0"/>
+                              <Component id="buttRemoveIng" linkSize="12" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -195,10 +195,10 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jButton5" linkSize="11" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jButton6" linkSize="11" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jButton7" linkSize="11" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jButton8" linkSize="11" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="buttRemoveIng" linkSize="11" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="buttEditIng" linkSize="11" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="buttSearchIng" linkSize="11" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="buttAddIng" linkSize="11" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jTextField2" linkSize="11" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -247,7 +247,7 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Component class="javax.swing.JButton" name="jButton5">
+            <Component class="javax.swing.JButton" name="buttRemoveIng">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="12" style="0"/>
@@ -257,7 +257,7 @@
                 </Property>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="jButton6">
+            <Component class="javax.swing.JButton" name="buttEditIng">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="12" style="0"/>
@@ -267,10 +267,10 @@
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton6ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttEditIngActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="jButton7">
+            <Component class="javax.swing.JButton" name="buttSearchIng">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="12" style="0"/>
@@ -280,7 +280,7 @@
                 </Property>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="jButton8">
+            <Component class="javax.swing.JButton" name="buttAddIng">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Dialog" size="12" style="0"/>
@@ -289,6 +289,9 @@
                   <ResourceString bundle="com/mycompany/cookbook/gui/Bundle.properties" key="addNew" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttAddIngActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel2">
               <Properties>
@@ -375,6 +378,9 @@
                   <ResourceString bundle="com/mycompany/cookbook/gui/Bundle.properties" key="showDetail" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttShowDetailActionPerformed"/>
+              </Events>
             </Component>
             <Container class="javax.swing.JScrollPane" name="jScrollPane1">
               <AuxValues>
@@ -473,6 +479,9 @@
                   <ResourceString bundle="com/mycompany/cookbook/gui/Bundle.properties" key="addNewRecipe" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttAddRecipeActionPerformed"/>
+              </Events>
             </Component>
             <Container class="javax.swing.JPanel" name="jPanel3">
               <Properties>
@@ -518,7 +527,7 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="buttSelectIng" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace pref="210" max="32767" attributes="0"/>
-                                  <Component id="jButton2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="buttSearchRec" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -554,7 +563,7 @@
                                   </Group>
                                   <EmptySpace pref="24" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="jButton2" linkSize="8" alignment="1" min="-2" max="-2" attributes="0"/>
+                              <Component id="buttSearchRec" linkSize="8" alignment="1" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -614,7 +623,7 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JButton" name="jButton2">
+                <Component class="javax.swing.JButton" name="buttSearchRec">
                   <Properties>
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Dialog" size="12" style="0"/>

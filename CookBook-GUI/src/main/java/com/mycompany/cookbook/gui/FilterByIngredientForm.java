@@ -62,7 +62,7 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
         jList2 = new javax.swing.JList();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        buttCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(500, 280));
@@ -93,8 +93,13 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
         jButton2.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         jButton2.setText(bundle.getString("ok")); // NOI18N
 
-        jButton3.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jButton3.setText(bundle.getString("cancel")); // NOI18N
+        buttCancel.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        buttCancel.setText(bundle.getString("cancel")); // NOI18N
+        buttCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttCancelActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);
         panel1.setLayout(panel1Layout);
@@ -106,7 +111,7 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
                     .addGroup(panel1Layout.createSequentialGroup()
                         .addComponent(jButton1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton3)
+                        .addComponent(buttCancel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton2))
                     .addGroup(panel1Layout.createSequentialGroup()
@@ -134,7 +139,7 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
                 .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
                     .addComponent(jButton2)
-                    .addComponent(jButton3))
+                    .addComponent(buttCancel))
                 .addContainerGap())
         );
 
@@ -166,6 +171,10 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
         model.removeElementAt(list.getSelectedIndex());
         
     }//GEN-LAST:event_removeChckbox
+
+    private void buttCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttCancelActionPerformed
+        super.dispose();
+    }//GEN-LAST:event_buttCancelActionPerformed
 
     /**
      * @param args the command line arguments
@@ -206,9 +215,9 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttCancel;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JList jList1;
     private javax.swing.JList jList2;
