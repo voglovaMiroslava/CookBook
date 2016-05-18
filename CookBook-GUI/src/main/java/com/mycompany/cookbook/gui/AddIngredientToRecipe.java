@@ -74,7 +74,6 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
         jScrollPane3.setViewportView(jTextArea1);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Add ingredient");
         setMinimumSize(new java.awt.Dimension(433, 229));
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle"); // NOI18N

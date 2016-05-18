@@ -65,7 +65,6 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
         jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Ingredient filter");
         setMinimumSize(new java.awt.Dimension(500, 280));
         setPreferredSize(new java.awt.Dimension(500, 280));
 
