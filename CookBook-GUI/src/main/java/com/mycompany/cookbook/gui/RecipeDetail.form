@@ -160,19 +160,8 @@
           <SubComponents>
             <Component class="javax.swing.JTable" name="jTable1">
               <Properties>
-                <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-                  <Table columnCount="2" rowCount="3">
-                    <Column editable="false" title="Name" type="java.lang.String">
-                      <Data value="Cibule"/>
-                      <Data value=" &#x10c;o&#x10d;ka"/>
-                      <Data value="P&#xe1;rek"/>
-                    </Column>
-                    <Column editable="false" title="Amount" type="java.lang.String">
-                      <Data value="1 ks"/>
-                      <Data value="200 g"/>
-                      <Data value="2 no&#x17e;i&#x10d;ky"/>
-                    </Column>
-                  </Table>
+                <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new IngredientAmountTableModel()" type="code"/>
                 </Property>
                 <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
                   <TableColumnModel selectionModel="0">
