@@ -398,7 +398,7 @@ public class RecipeDetail extends javax.swing.JFrame {
     }//GEN-LAST:event_buttCloseActionPerformed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        loadData();
+        //loadData();
     }//GEN-LAST:event_formWindowOpened
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed

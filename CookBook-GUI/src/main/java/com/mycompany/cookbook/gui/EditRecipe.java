@@ -306,7 +306,7 @@ public class EditRecipe extends javax.swing.JFrame {
         jLabel2.setText(bundle.getString("duration")); // NOI18N
 
         jSpinner1.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Long.valueOf(0L), Long.valueOf(0L), null, Long.valueOf(1L)));
         jSpinner1.setEnabled(false);
 
         jComboBox1.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
@@ -543,11 +543,11 @@ public class EditRecipe extends javax.swing.JFrame {
         r.setInstructions(jTextArea1.getText());
         switch(jComboBox1.getSelectedIndex()){
             case 0 : 
-                r.setDuration(Duration.ofMinutes((Integer)jSpinner1.getValue()));
+                r.setDuration(Duration.ofMinutes((Long)jSpinner1.getValue()));
             case 1 : 
-                r.setDuration(Duration.ofHours((Integer)jSpinner1.getValue()));
+                r.setDuration(Duration.ofHours((Long)jSpinner1.getValue()));
             case 2 : 
-                r.setDuration(Duration.ofDays((Integer)jSpinner1.getValue()));
+                r.setDuration(Duration.ofDays((Long)jSpinner1.getValue()));
         }
         
         new SaveRecipeInfoWorker(r, this).execute();
