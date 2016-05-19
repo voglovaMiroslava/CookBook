@@ -11,7 +11,6 @@ import eu.dominiktousek.pv168.cookbook.IngredientManagerImpl;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import org.slf4j.Logger;
@@ -204,7 +203,7 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
     private void buttSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttSearchActionPerformed
         ((IngredientTableModel) tableIngredient.getModel()).clear();
         String name = fieldName.getText();
-        (new SearchIngredientWorker(name, this)).execute();
+        (new SearchIngredientWorker(name)).execute();
 
     }//GEN-LAST:event_buttSearchActionPerformed
 
@@ -218,7 +217,7 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
         Ingredient ingr = model.getValueByRow(rowNum);
         amount.setIngredient(ingr);
         amount.setAmount( fieldAmount.getText());
-        
+        this.dispose();
     }//GEN-LAST:event_buttOkActionPerformed
 
 
@@ -243,11 +242,9 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
     private class SearchIngredientWorker extends SwingWorker<List<Ingredient>, Void> {
 
         private String name;
-        private JFrame frame;
 
-        public SearchIngredientWorker(String name, JFrame frame) {
+        public SearchIngredientWorker(String name) {
             this.name = name;
-            this.frame = frame;
         }
 
         @Override
@@ -267,7 +264,7 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
             } catch (InterruptedException | ExecutionException ex) {
                 LOG.error(ex.getMessage());
             }
-            frame.dispose();
+
         }
 
     }
