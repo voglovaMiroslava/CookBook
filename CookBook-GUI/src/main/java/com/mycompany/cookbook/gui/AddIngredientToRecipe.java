@@ -5,42 +5,34 @@
  */
 package com.mycompany.cookbook.gui;
 
-import javax.swing.AbstractListModel;
-import javax.swing.DefaultListModel;
-import javax.swing.JList;
-import javax.swing.ListModel;
+import eu.dominiktousek.pv168.cookbook.Ingredient;
+import eu.dominiktousek.pv168.cookbook.IngredientAmount;
+import eu.dominiktousek.pv168.cookbook.IngredientManagerImpl;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import javax.swing.SwingWorker;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Dominik
  */
 public class AddIngredientToRecipe extends javax.swing.JFrame {
-    private ListModel selectedIngredients;
-    private ListModel allIngredients;
+
+    final static Logger LOG = LoggerFactory.getLogger(AddIngredientToRecipe.class);
+    private IngredientAmount amount = null;
+
+    public IngredientAmount getAmount(){
+        return amount;
+    }
     
     /**
      * Creates new form MainForm
      */
     public AddIngredientToRecipe() {
-        selectedIngredients = new DefaultListModel();
-        ((DefaultListModel)selectedIngredients).addElement("Cibule");
-        ((DefaultListModel)selectedIngredients).addElement("Pórek");
-        ((DefaultListModel)selectedIngredients).addElement("Brambory");
-        ((DefaultListModel)selectedIngredients).addElement("Mrkev");
-        
-        allIngredients = new AbstractListModel() {
-            String[] strings = { 
-                "Kopřiva", 
-                "Pantofel",
-                "Cukr",
-                "Kukuřice",
-                "Řepa",
-                "Salát",
-                "Okurka"
-            };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        };
+
         initComponents();
     }
 
@@ -56,18 +48,18 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         panel1 = new java.awt.Panel();
-        jLabel1 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList();
+        fieldName = new javax.swing.JTextField();
         label3 = new java.awt.Label();
         label4 = new java.awt.Label();
         jLabel5 = new javax.swing.JLabel();
         buttCreateIng = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        fieldAmount = new javax.swing.JTextField();
         buttCancel = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        buttOk = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tableIngredient = new javax.swing.JTable();
+        buttSearch = new javax.swing.JButton();
 
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
@@ -76,18 +68,14 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(433, 229));
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle"); // NOI18N
-        jLabel1.setText(bundle.getString("search")); // NOI18N
-
-        jTextField2.setToolTipText("Search existing ingredient");
-
-        jList1.setModel(allIngredients);
-        jScrollPane1.setViewportView(jList1);
+        fieldName.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        fieldName.setToolTipText("Search existing ingredient");
 
         label3.setText("<none>");
 
         label4.setText("label4");
 
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle"); // NOI18N
         jLabel5.setText(bundle.getString("amount")); // NOI18N
 
         buttCreateIng.setText(bundle.getString("createNew")); // NOI18N
@@ -97,9 +85,11 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
             }
         });
 
+        jLabel6.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         jLabel6.setText(bundle.getString("or")); // NOI18N
 
-        jTextField1.setToolTipText("For exampe: '1 Ks'");
+        fieldAmount.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        fieldAmount.setToolTipText("For exampe: '1 Ks'");
 
         buttCancel.setText(bundle.getString("cancel")); // NOI18N
         buttCancel.addActionListener(new java.awt.event.ActionListener() {
@@ -108,7 +98,24 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
             }
         });
 
-        jButton3.setText(bundle.getString("ok")); // NOI18N
+        buttOk.setText(bundle.getString("ok")); // NOI18N
+        buttOk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttOkActionPerformed(evt);
+            }
+        });
+
+        tableIngredient.setModel(new IngredientTableModel());
+        buttSearchActionPerformed(new java.awt.event.ActionEvent(new Object(),0,"command"));
+        jScrollPane2.setViewportView(tableIngredient);
+
+        buttSearch.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        buttSearch.setText(bundle.getString("search")); // NOI18N
+        buttSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttSearchActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);
         panel1.setLayout(panel1Layout);
@@ -118,44 +125,47 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(buttCreateIng, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 393, Short.MAX_VALUE)
-                    .addGroup(panel1Layout.createSequentialGroup()
                         .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1))
+                        .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(panel1Layout.createSequentialGroup()
+                                .addGap(367, 367, 367)
+                                .addComponent(buttCancel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(buttOk, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panel1Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(fieldAmount)
+                                .addGap(1, 1, 1))))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 550, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panel1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(buttCancel)
+                        .addComponent(fieldName, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(1, 1, 1)
+                        .addComponent(buttSearch)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                        .addComponent(jLabel6)
+                        .addGap(19, 19, 19)
+                        .addComponent(buttCreateIng, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
         panel1Layout.setVerticalGroup(
             panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel1Layout.createSequentialGroup()
                 .addGap(13, 13, 13)
                 .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1)
+                    .addComponent(fieldName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(buttCreateIng)
-                    .addComponent(jLabel6))
+                    .addComponent(jLabel6)
+                    .addComponent(buttSearch))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE)
-                .addGap(19, 19, 19)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(fieldAmount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(buttCancel)
-                    .addComponent(jButton3))
+                    .addComponent(buttOk))
                 .addContainerGap())
         );
 
@@ -189,63 +199,73 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
         super.dispose();
     }//GEN-LAST:event_buttCancelActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(AddIngredientToRecipe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(AddIngredientToRecipe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(AddIngredientToRecipe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(AddIngredientToRecipe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
+    private void buttSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttSearchActionPerformed
+        ((IngredientTableModel) tableIngredient.getModel()).clear();
+        String name = fieldName.getText();
+        (new SearchIngredientWorker(name)).execute();
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new AddIngredientToRecipe().setVisible(true);
-            }
-        });
-    }
+    }//GEN-LAST:event_buttSearchActionPerformed
+
+    private void buttOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttOkActionPerformed
+        int rowNum = tableIngredient.getSelectedRow();
+        if (rowNum == -1 || fieldAmount.getText().isEmpty()) {
+            return;
+        }
+        
+        IngredientTableModel model = (IngredientTableModel) tableIngredient.getModel();
+        Ingredient ingr = model.getValueByRow(rowNum);
+        amount.setIngredient(ingr);
+        amount.setAmount( fieldAmount.getText());
+        
+    }//GEN-LAST:event_buttOkActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttCancel;
     private javax.swing.JButton buttCreateIng;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton buttOk;
+    private javax.swing.JButton buttSearch;
+    private javax.swing.JTextField fieldAmount;
+    private javax.swing.JTextField fieldName;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JList jList1;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     private java.awt.Label label3;
     private java.awt.Label label4;
     private java.awt.Panel panel1;
+    private javax.swing.JTable tableIngredient;
     // End of variables declaration//GEN-END:variables
+
+    private class SearchIngredientWorker extends SwingWorker<List<Ingredient>, Void> {
+
+        private String name;
+
+        public SearchIngredientWorker(String name) {
+            this.name = name;
+        }
+
+        @Override
+        protected List<Ingredient> doInBackground() throws Exception {
+            return new IngredientManagerImpl().searchByName(name);
+        }
+
+        @Override
+        protected void done() {
+            IngredientTableModel model = (IngredientTableModel) tableIngredient.getModel();
+            try {
+                List<Ingredient> ingres = this.get();
+
+                for (Ingredient ing : ingres) {
+                    model.addItem(ing);
+                }
+            } catch (InterruptedException | ExecutionException ex) {
+                LOG.error(ex.getMessage());
+            }
+
+        }
+
+    }
+
 }
