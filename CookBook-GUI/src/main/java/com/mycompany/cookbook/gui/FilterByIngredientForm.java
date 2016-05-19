@@ -110,6 +110,7 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
 
         tableIngredient.setModel(new IngredientTableModel()
         );
+        buttSearchActionPerformed(new java.awt.event.ActionEvent(new Object(),0,"neco"));
         jScrollPane3.setViewportView(tableIngredient);
 
         javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);

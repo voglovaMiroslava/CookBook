@@ -201,6 +201,9 @@
                   <Connection code="new IngredientTableModel()&#xd;&#xa;" type="code"/>
                 </Property>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="buttSearchActionPerformed(new java.awt.event.ActionEvent(new Object(),0,&quot;neco&quot;));&#xd;&#xa;"/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>
