@@ -9,7 +9,6 @@ import eu.dominiktousek.pv168.cookbook.Ingredient;
 import eu.dominiktousek.pv168.cookbook.IngredientManagerImpl;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.SwingWorker;
 import org.slf4j.Logger;
@@ -24,11 +23,14 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
     private IngredientFormFilterModel selectedIngredients;
 
     final static Logger LOG = LoggerFactory.getLogger(MainForm.class);
+    
+    private MainForm form;
 
     /**
      * Creates new form MainForm
      */
-    public FilterByIngredientForm() {
+    public FilterByIngredientForm(MainForm form) {
+        this.form = form;
         initComponents();
         selectedIngredients = (IngredientFormFilterModel) jList2.getModel();
     }
@@ -54,8 +56,10 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
         tableIngredient = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new java.awt.Dimension(500, 280));
-        setPreferredSize(new java.awt.Dimension(500, 280));
+        setMinimumSize(new java.awt.Dimension(700, 700));
+        setPreferredSize(new java.awt.Dimension(500, 500));
+
+        panel1.setPreferredSize(new java.awt.Dimension(800, 800));
 
         fieldName.setToolTipText("Type here your search query");
 
@@ -101,6 +105,8 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
             }
         });
 
+        jScrollPane3.setPreferredSize(new java.awt.Dimension(700, 700));
+
         tableIngredient.setModel(new IngredientTableModel()
         );
         jScrollPane3.setViewportView(tableIngredient);
@@ -136,8 +142,8 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
                     .addComponent(buttSearch))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
                 .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(buttAddToFilter)
@@ -204,43 +210,6 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FilterByIngredientForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FilterByIngredientForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FilterByIngredientForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FilterByIngredientForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new FilterByIngredientForm().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttAddToFilter;
