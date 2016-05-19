@@ -7,6 +7,7 @@ package com.mycompany.cookbook.gui;
 
 import eu.dominiktousek.pv168.cookbook.Ingredient;
 import eu.dominiktousek.pv168.cookbook.IngredientAmount;
+import eu.dominiktousek.pv168.cookbook.IngredientAmountManagerImpl;
 import eu.dominiktousek.pv168.cookbook.IngredientManagerImpl;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -24,16 +25,13 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
 
     final static Logger LOG = LoggerFactory.getLogger(AddIngredientToRecipe.class);
     private IngredientAmount amount = new IngredientAmount();
-
-    public IngredientAmount getAmount(){
-        return amount;
-    }
+    private Long recipeId;
     
     /**
      * Creates new form MainForm
      */
-    public AddIngredientToRecipe() {
-
+    public AddIngredientToRecipe(Long id) {
+        recipeId= id;
         initComponents();
     }
 
@@ -217,7 +215,9 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
         Ingredient ingr = model.getValueByRow(rowNum);
         amount.setIngredient(ingr);
         amount.setAmount( fieldAmount.getText());
-        this.dispose();
+        amount.setRecipeId(recipeId);
+        
+        (new CreateIngredientAmountWorker(amount, this)).execute();
     }//GEN-LAST:event_buttOkActionPerformed
 
 
@@ -267,6 +267,28 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
 
         }
 
+    }
+    
+    private class CreateIngredientAmountWorker extends SwingWorker<Integer, Void>{
+
+        private IngredientAmount amount;
+        private JFrame frame;
+        
+        public CreateIngredientAmountWorker(IngredientAmount amount, JFrame frame){
+            this.amount = amount;
+            this.frame = frame;
+        }
+        
+        @Override
+        protected Integer doInBackground() throws Exception {
+            new IngredientAmountManagerImpl().addIngredientInRecipe(amount);
+            return 1;
+        }
+    
+        @Override
+        protected void done() {
+            frame.dispose();
+        }
     }
 
 }
