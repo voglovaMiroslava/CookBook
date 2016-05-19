@@ -94,11 +94,17 @@ public class MainForm extends javax.swing.JFrame {
         tableIngredient.setModel(new IngredientTableModel());
         tableIngredient.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         buttSearchIngActionPerformed(new java.awt.event.ActionEvent(new Object(), 0, "click"));
+        tableIngredient.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableIngredientMouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(tableIngredient);
 
         buttRemoveIng.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle"); // NOI18N
         buttRemoveIng.setText(bundle.getString("removeIngredient")); // NOI18N
+        buttRemoveIng.setEnabled(false);
         buttRemoveIng.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttRemoveIngActionPerformed(evt);
@@ -107,6 +113,7 @@ public class MainForm extends javax.swing.JFrame {
 
         buttEditIng.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         buttEditIng.setText(bundle.getString("editIngredient")); // NOI18N
+        buttEditIng.setEnabled(false);
         buttEditIng.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttEditIngActionPerformed(evt);
@@ -185,6 +192,7 @@ public class MainForm extends javax.swing.JFrame {
 
         buttShowDetail.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         buttShowDetail.setText(bundle.getString("showDetail")); // NOI18N
+        buttShowDetail.setEnabled(false);
         buttShowDetail.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttShowDetailActionPerformed(evt);
@@ -196,10 +204,16 @@ public class MainForm extends javax.swing.JFrame {
         tableRecipe.setAutoscrolls(false);
         tableRecipe.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         buttSearchRecActionPerformed(new java.awt.event.ActionEvent(new Object(),0,"click"));
+        tableRecipe.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableRecipeMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tableRecipe);
 
         buttRemoveRecipe.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         buttRemoveRecipe.setText(bundle.getString("removeRecipe")); // NOI18N
+        buttRemoveRecipe.setEnabled(false);
         buttRemoveRecipe.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttRemoveRecipeActionPerformed(evt);
@@ -616,6 +630,9 @@ public class MainForm extends javax.swing.JFrame {
         }
 
         new SearchRecipeWorker(name, from, to, ingrs).execute();
+        
+        buttShowDetail.setEnabled(false);
+        buttRemoveRecipe.setEnabled(false);
     }//GEN-LAST:event_buttSearchRecActionPerformed
 
     private void buttSearchIngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttSearchIngActionPerformed
@@ -623,6 +640,9 @@ public class MainForm extends javax.swing.JFrame {
 
         String name = fieldIngredientName.getText();
         new SearchIngredientWorker(name).execute();
+        
+        buttEditIng.setEnabled(false);
+        buttRemoveIng.setEnabled(false);
     }//GEN-LAST:event_buttSearchIngActionPerformed
 
     private int messageDialog() {
@@ -677,6 +697,20 @@ public class MainForm extends javax.swing.JFrame {
 
     }//GEN-LAST:event_tabbedPanelFocusGained
 
+    private void tableRecipeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableRecipeMouseClicked
+        if(tableRecipe.getSelectedRow()>-1){
+            buttShowDetail.setEnabled(true);
+            buttRemoveRecipe.setEnabled(true);
+        }
+    }//GEN-LAST:event_tableRecipeMouseClicked
+
+    private void tableIngredientMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableIngredientMouseClicked
+        if(tableIngredient.getSelectedRow()>-1){
+            buttEditIng.setEnabled(true);
+            buttRemoveIng.setEnabled(true);
+        }
+    }//GEN-LAST:event_tableIngredientMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -705,6 +739,13 @@ public class MainForm extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(() -> {
             new MainForm().setVisible(true);
         });
+    }
+    
+    public void setIngredientFilter(List<Ingredient> items){
+        IngredientComboboxModel model = (IngredientComboboxModel) comboSearchIngredients.getModel();
+        for(Ingredient i:items){
+            model.addItem(i);
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

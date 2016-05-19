@@ -167,6 +167,12 @@ public class RecipeDetail extends javax.swing.JFrame {
         new LoadRecipeIngredientsWorker(recipeId,this).execute();
     }
     
+    private void refreshData(){
+        IngredientAmountTableModel m = (IngredientAmountTableModel) jTable1.getModel();
+        m.clear();
+        loadData();
+     }
+    
     /**
      * Creates new form RecipeDetail
      */
@@ -206,6 +212,13 @@ public class RecipeDetail extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(700, 350));
+        addWindowFocusListener(new java.awt.event.WindowFocusListener() {
+            public void windowGainedFocus(java.awt.event.WindowEvent evt) {
+                formWindowGainedFocus(evt);
+            }
+            public void windowLostFocus(java.awt.event.WindowEvent evt) {
+            }
+        });
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
@@ -413,6 +426,10 @@ public class RecipeDetail extends javax.swing.JFrame {
             new RemoveRecipeWorker(recipeId, this).execute();
         }
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void formWindowGainedFocus(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowGainedFocus
+        refreshData();
+    }//GEN-LAST:event_formWindowGainedFocus
 
     /**
      * @param args the command line arguments

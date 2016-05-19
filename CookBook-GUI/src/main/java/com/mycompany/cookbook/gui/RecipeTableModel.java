@@ -1,7 +1,6 @@
 package com.mycompany.cookbook.gui;
 
 import eu.dominiktousek.pv168.cookbook.Recipe;
-import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -35,7 +34,7 @@ public class RecipeTableModel extends AbstractTableModel {
             case 1 : 
                 return item.getInstructions();
             case 2 : 
-                return item.getDuration();
+                return DurationFormater.format(item.getDuration());
             default : 
                 throw new IllegalArgumentException("columnIndex");
         }
@@ -82,7 +81,7 @@ public class RecipeTableModel extends AbstractTableModel {
             case 1:
                 return String.class;
             case 2:
-                return Duration.class;
+                return String.class;
             default:
                 throw new IllegalArgumentException("columnIndex");
         }

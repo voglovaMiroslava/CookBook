@@ -224,7 +224,15 @@ public class EditRecipe extends javax.swing.JFrame {
     private void loadData(){
         statLabel.setText(bundle.getString("loading"));
         new LoadRecipeInfoWorker(recipeId,this).execute();
-        new LoadRecipeIngredientsWorker(recipeId,this).execute();
+        //new LoadRecipeIngredientsWorker(recipeId,this).execute();
+    }
+    
+    private void refreshIngredients(){
+        if(recipeId!=null){
+            IngredientAmountTableModel m = (IngredientAmountTableModel) jTable1.getModel();
+            m.clear();
+            new LoadRecipeIngredientsWorker(recipeId,this).execute();
+        }
     }
     
     /**
@@ -267,7 +275,22 @@ public class EditRecipe extends javax.swing.JFrame {
         statLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                formFocusGained(evt);
+            }
+        });
+        addWindowFocusListener(new java.awt.event.WindowFocusListener() {
+            public void windowGainedFocus(java.awt.event.WindowEvent evt) {
+                formWindowGainedFocus(evt);
+            }
+            public void windowLostFocus(java.awt.event.WindowEvent evt) {
+            }
+        });
         addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
             }
@@ -561,6 +584,18 @@ public class EditRecipe extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    private void formFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusGained
+        
+    }//GEN-LAST:event_formFocusGained
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        
+    }//GEN-LAST:event_formWindowActivated
+
+    private void formWindowGainedFocus(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowGainedFocus
+        refreshIngredients();
+    }//GEN-LAST:event_formWindowGainedFocus
+
     /**
      * @param args the command line arguments
      */
@@ -595,7 +630,7 @@ public class EditRecipe extends javax.swing.JFrame {
             }
         });
     }
-
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttAddIngredientToRecipe;
     private javax.swing.JButton buttCancel;

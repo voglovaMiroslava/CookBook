@@ -218,6 +218,7 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
         amount.setRecipeId(recipeId);
         
         (new CreateIngredientAmountWorker(amount, this)).execute();
+        
     }//GEN-LAST:event_buttOkActionPerformed
 
 
