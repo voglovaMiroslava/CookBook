@@ -17,10 +17,11 @@ import javax.swing.ComboBoxModel;
  *
  * @author Dominik
  */
-public class IngredientComboboxModel extends AbstractListModel implements ComboBoxModel{
+public class IngredientComboboxModel extends AbstractListModel implements ComboBoxModel {
+
     private final List<Ingredient> items = new LinkedList<>();
     private Ingredient selected = null;
-    
+
     @Override
     public int getSize() {
         return items.size();
@@ -31,24 +32,26 @@ public class IngredientComboboxModel extends AbstractListModel implements ComboB
         Ingredient item = items.get(index);
         return item.getName();
     }
-    
-    public void addItem(Ingredient item){
+
+    public void addItem(Ingredient item) {
         int idx = items.size();
         items.add(item);
         fireIntervalAdded(this, idx, idx);
     }
-    
-    public void clear(){
+
+    public void clear() {
         int size = items.size();
         items.clear();
-        fireIntervalRemoved(this, 0, size-1);
+        if (size > 0) {
+            fireIntervalRemoved(this, 0, size - 1);
+        }
     }
-    
-    public List<Ingredient> getAllItems(){
+
+    public List<Ingredient> getAllItems() {
         return Collections.unmodifiableList(items);
     }
-    
-    public Ingredient getValueByIndex(int idx){
+
+    public Ingredient getValueByIndex(int idx) {
         return items.get(idx);
     }
 
@@ -61,5 +64,5 @@ public class IngredientComboboxModel extends AbstractListModel implements ComboB
     public Object getSelectedItem() {
         return null;
     }
-    
+
 }
