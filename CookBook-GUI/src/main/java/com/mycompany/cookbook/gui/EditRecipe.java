@@ -11,10 +11,12 @@ package com.mycompany.cookbook.gui;
  */
 public class EditRecipe extends javax.swing.JFrame {
 
+    private Long recipeId;
     /**
      * Creates new form EditRecipe
      */
-    public EditRecipe() {
+    public EditRecipe(Long recipeId) {
+        this.recipeId = recipeId;
         initComponents();
     }
 
@@ -299,7 +301,7 @@ public class EditRecipe extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new EditRecipe().setVisible(true);
+                //new EditRecipe().setVisible(true);
             }
         });
     }
