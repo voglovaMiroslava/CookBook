@@ -485,7 +485,7 @@ public class EditRecipe extends javax.swing.JFrame {
     }//GEN-LAST:event_buttCancelActionPerformed
 
     private void buttAddIngredientToRecipeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttAddIngredientToRecipeActionPerformed
-        javax.swing.JFrame addToRecipe = new AddIngredientToRecipe();
+        javax.swing.JFrame addToRecipe = new AddIngredientToRecipe(recipeId);
         addToRecipe.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         addToRecipe.setVisible(true);
     }//GEN-LAST:event_buttAddIngredientToRecipeActionPerformed
