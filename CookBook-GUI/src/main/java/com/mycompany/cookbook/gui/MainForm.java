@@ -739,6 +739,7 @@ public class MainForm extends javax.swing.JFrame {
     
     public void setIngredientFilter(List<Ingredient> items){
         IngredientComboboxModel model = (IngredientComboboxModel) comboSearchIngredients.getModel();
+        model.clear();
         for(Ingredient i:items){
             model.addItem(i);
         }
