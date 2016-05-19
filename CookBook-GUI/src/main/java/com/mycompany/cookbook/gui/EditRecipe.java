@@ -5,21 +5,237 @@
  */
 package com.mycompany.cookbook.gui;
 
+import eu.dominiktousek.pv168.cookbook.EntityNotFoundException;
+import eu.dominiktousek.pv168.cookbook.IngredientAmount;
+import eu.dominiktousek.pv168.cookbook.IngredientAmountManager;
+import eu.dominiktousek.pv168.cookbook.IngredientAmountManagerImpl;
+import eu.dominiktousek.pv168.cookbook.Recipe;
+import eu.dominiktousek.pv168.cookbook.RecipeManager;
+import eu.dominiktousek.pv168.cookbook.RecipeManagerImpl;
+import eu.dominiktousek.pv168.cookbook.ServiceFailureException;
+import java.time.Duration;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
+import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  *
  * @author Miroslava
  */
 public class EditRecipe extends javax.swing.JFrame {
 
-    private Long recipeId;
+    final static Logger LOG = LoggerFactory.getLogger(RecipeDetail.class);
+    
+    private final Long recipeId;
+    private final ResourceBundle bundle;
+    
+    private boolean recipeLoaded = false;
+    private boolean ingredientsLoaded = false;
+    
+    
+    private class LoadRecipeInfoWorker extends SwingWorker<Recipe,Void>{
+
+        private final Long recipeId;
+        private final javax.swing.JFrame parentForm;
+
+        public LoadRecipeInfoWorker(Long recipeId, javax.swing.JFrame parentForm){
+            this.recipeId = recipeId;
+            this.parentForm = parentForm;
+        }
+
+        @Override
+        protected Recipe doInBackground() throws Exception {
+            RecipeManager man = new RecipeManagerImpl();
+            return man.getRecipeById(recipeId);
+        }
+
+        @Override
+        protected void done() {   
+            try {
+                Recipe recipe = this.get();
+                jTextField1.setText(recipe.getName());
+                Long d = recipe.getDuration().toDays();
+                Long h = recipe.getDuration().toHours();
+                Long m = recipe.getDuration().toMinutes();
+               
+                int unit = 0;
+                if((h>0)&&(h*60==m)){
+                    unit = 1;
+                }
+                if((d>0)&&(d*24*60==m)){
+                    unit = 2;
+                }
+                
+                jSpinner1.setValue((unit==2)?d:(unit==1)?h:m);
+                jComboBox1.setSelectedIndex(unit);
+                jTextArea1.setText(recipe.getInstructions());
+                recipeLoaded = true;
+                if(ingredientsLoaded){
+                    loadingDone();
+                }
+            } catch (InterruptedException | ExecutionException ex) {
+                LOG.error("Background loading of recipe was not successfull", ex);
+                if(parentForm.isDisplayable()){
+                    JOptionPane.showMessageDialog(parentForm, bundle.getString("background loading failed"),"",JOptionPane.ERROR_MESSAGE);
+                    parentForm.dispose();
+                }
+            }
+        }
+
+    }
+    
+    private class LoadRecipeIngredientsWorker extends SwingWorker<List<IngredientAmount>,Void>{
+
+        private final Long recipeId;
+        private final javax.swing.JFrame parentForm;
+
+        public LoadRecipeIngredientsWorker(Long recipeId, javax.swing.JFrame parentForm){
+            this.recipeId = recipeId;
+            this.parentForm = parentForm;
+        }
+
+        @Override
+        protected List<IngredientAmount> doInBackground() throws Exception {
+                IngredientAmountManager man = new IngredientAmountManagerImpl();
+                return man.getIngredientsByRecipe(recipeId);
+        }
+
+        @Override
+        protected void done(){   
+            try {
+                List<IngredientAmount> ingredientAmounts = this.get();
+                IngredientAmountTableModel model = (IngredientAmountTableModel) jTable1.getModel();
+                
+                for(IngredientAmount i : ingredientAmounts){
+                    model.addItem(i);
+                }
+                
+                ingredientsLoaded = true;
+                if(recipeLoaded){
+                    loadingDone();
+                }
+            } catch (InterruptedException | ExecutionException ex) {
+                LOG.error("Background loading of ingredient amounts was not successfull", ex);
+                if(parentForm.isDisplayable()){
+                    JOptionPane.showMessageDialog(parentForm, bundle.getString("background loading failed"),"",JOptionPane.ERROR_MESSAGE);
+                    parentForm.dispose();
+                }
+            }
+        }
+
+    }
+    
+    private class SaveRecipeInfoWorker extends SwingWorker<Boolean,Void>{
+
+        private final Recipe recipe;
+        private final javax.swing.JFrame parentForm;
+
+        public SaveRecipeInfoWorker(Recipe recipe, javax.swing.JFrame parentForm){
+            this.recipe = recipe;
+            this.parentForm = parentForm;
+        }
+
+        @Override
+        protected Boolean doInBackground() throws Exception {
+            try{
+                RecipeManager man = new RecipeManagerImpl();
+                if(recipe.getId()==null){
+                    man.createRecipe(recipe);
+                }
+                else{
+                    man.updateRecipe(recipe);
+                }
+            }catch(EntityNotFoundException ex){
+                LOG.error("Saving recipe was not successfull", ex);
+                return false;
+            }
+            catch(ServiceFailureException ex){
+                LOG.error("Saving/creating  recipe was not successfull", ex);
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        protected void done() {   
+            try {
+                if(get()){
+                    parentForm.dispose();
+                }else{
+                    JOptionPane.showMessageDialog(parentForm, bundle.getString("saving failed"),"",JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (InterruptedException | ExecutionException ex) {
+                LOG.error("Saving recipe was not successfull", ex);
+                JOptionPane.showMessageDialog(parentForm, bundle.getString("saving failed"),"",JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+    }
+    
+    private class RemoveIngredientAmountWorker extends SwingWorker<Boolean,Void>{
+
+        private final Long iAmountId;
+        private final javax.swing.JFrame parentForm;
+
+        public RemoveIngredientAmountWorker(Long iAmountId, javax.swing.JFrame parentForm){
+            this.iAmountId = iAmountId;
+            this.parentForm = parentForm;
+        }
+
+        @Override
+        protected Boolean doInBackground() throws Exception {
+            try{
+                IngredientAmountManager man = new IngredientAmountManagerImpl();
+                man.deleteIngredientFromRecipe(iAmountId);
+            }catch(EntityNotFoundException | ServiceFailureException ex){
+                LOG.error("Removing ingredient form recipe was not successfull", ex);
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        protected void done() {   
+            try {
+                if(!get()){
+                    JOptionPane.showMessageDialog(parentForm, bundle.getString("remove failed"),"",JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (InterruptedException | ExecutionException ex) {
+                LOG.info("Removing ingredient form recipe was not successfull", ex);
+                JOptionPane.showMessageDialog(parentForm, bundle.getString("remove failed"),"",JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+    }
+    
+    private void loadingDone(){
+        statLabel.setText("");
+        buttAddIngredientToRecipe.setEnabled(true);
+        jButton1.setEnabled(true);
+        jTextArea1.setEnabled(true);
+        jTextField1.setEnabled(true);
+        jSpinner1.setEnabled(true);
+    }
+    
+    private void loadData(){
+        statLabel.setText(bundle.getString("loading"));
+        new LoadRecipeInfoWorker(recipeId,this).execute();
+        new LoadRecipeIngredientsWorker(recipeId,this).execute();
+    }
+    
     /**
      * Creates new form EditRecipe
      */
     public EditRecipe(Long recipeId) {
+        bundle = ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle");
         this.recipeId = recipeId;
         initComponents();
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -33,7 +249,7 @@ public class EditRecipe extends javax.swing.JFrame {
         jTextField1 = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jSpinner1 = new javax.swing.JSpinner();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        jComboBox1 = new javax.swing.JComboBox<String>();
         jButton1 = new javax.swing.JButton();
         buttAddIngredientToRecipe = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
@@ -47,25 +263,39 @@ public class EditRecipe extends javax.swing.JFrame {
         jTextArea1 = new javax.swing.JTextArea();
         jSeparator2 = new javax.swing.JSeparator();
         buttCancel = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
+        statLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("name")); // NOI18N
 
+        jTextField1.setEnabled(false);
+
         jLabel2.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         jLabel2.setText(bundle.getString("duration")); // NOI18N
 
         jSpinner1.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        jSpinner1.setEnabled(false);
 
         jComboBox1.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { bundle.getString("minute(s)"), bundle.getString("hour(s)"), bundle.getString("day(s)") }));
 
         jButton1.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         jButton1.setText(bundle.getString("save")); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         buttAddIngredientToRecipe.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         buttAddIngredientToRecipe.setText(bundle.getString("addIngredient")); // NOI18N
@@ -80,30 +310,16 @@ public class EditRecipe extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         jLabel4.setText(bundle.getString("ingredients")); // NOI18N
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {"Cibule", "1 ks"},
-                {"Hořčice", "100 ml"},
-                {"Kukuřice", "2 ks"},
-                {"Vejce", "3 ks"}
-            },
-            new String [] {
-                "Name", "Amount"
+        jTable1.setModel(new IngredientAmountTableModel());
+        jTable1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
             }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
+        });
+        jTable1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jTable1PropertyChange(evt);
             }
         });
         jScrollPane2.setViewportView(jTable1);
@@ -144,6 +360,7 @@ public class EditRecipe extends javax.swing.JFrame {
 
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
+        jTextArea1.setEnabled(false);
         jScrollPane1.setViewportView(jTextArea1);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -182,13 +399,14 @@ public class EditRecipe extends javax.swing.JFrame {
             }
         });
 
-        jButton3.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jButton3.setText(bundle.getString("editAmount")); // NOI18N
-        jButton3.setEnabled(false);
-
         jButton4.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         jButton4.setText(bundle.getString("remove")); // NOI18N
         jButton4.setEnabled(false);
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -197,7 +415,9 @@ public class EditRecipe extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap()
+                        .addComponent(statLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(buttCancel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1))
@@ -211,8 +431,6 @@ public class EditRecipe extends javax.swing.JFrame {
                                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 384, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                     .addComponent(jButton4)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jButton3)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(buttAddIngredientToRecipe)
                                     .addGap(2, 2, 2)))
@@ -247,8 +465,9 @@ public class EditRecipe extends javax.swing.JFrame {
                         .addGap(7, 7, 7)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(buttAddIngredientToRecipe)
-                            .addComponent(jButton3)
-                            .addComponent(jButton4)))
+                            .addComponent(jButton4))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(statLabel))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -270,6 +489,77 @@ public class EditRecipe extends javax.swing.JFrame {
         addToRecipe.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         addToRecipe.setVisible(true);
     }//GEN-LAST:event_buttAddIngredientToRecipeActionPerformed
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        if(recipeId!=null){
+            loadData();
+        }
+        else{
+            loadingDone();
+        }
+    }//GEN-LAST:event_formWindowOpened
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        if(jTextField1.getText().isEmpty()){
+           JOptionPane.showMessageDialog(this,
+            bundle.getString("empty name"),
+            "",
+            JOptionPane.WARNING_MESSAGE); 
+           return;
+        }
+        if(jTextArea1.getText().isEmpty()){
+           JOptionPane.showMessageDialog(this,
+            bundle.getString("empty instructions"),
+            "",
+            JOptionPane.WARNING_MESSAGE); 
+           return;
+        }
+        Recipe r = new Recipe();
+        r.setId(recipeId);
+        r.setName(jTextField1.getText());
+        r.setInstructions(jTextArea1.getText());
+        switch(jComboBox1.getSelectedIndex()){
+            case 0 : 
+                r.setDuration(Duration.ofMinutes((Integer)jSpinner1.getValue()));
+            case 1 : 
+                r.setDuration(Duration.ofHours((Integer)jSpinner1.getValue()));
+            case 2 : 
+                r.setDuration(Duration.ofDays((Integer)jSpinner1.getValue()));
+        }
+        
+        new SaveRecipeInfoWorker(r, this).execute();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTable1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jTable1PropertyChange
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTable1PropertyChange
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        if(jTable1.getSelectedRow()>-1){
+            jButton4.setEnabled(true);
+        }
+    }//GEN-LAST:event_jTable1MouseClicked
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        Object[] options = {
+            bundle.getString("yes"),
+            bundle.getString("no")
+        };
+            
+        int n = JOptionPane.showOptionDialog(this,
+            bundle.getString("confirm delete"),
+            "",
+            JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            options[1]);
+        if(n==0){
+            IngredientAmountTableModel model = (IngredientAmountTableModel) jTable1.getModel();
+            IngredientAmount item = model.getValueByRow(jTable1.convertRowIndexToModel(jTable1.getSelectedRow()));
+            new RemoveIngredientAmountWorker(item.getId(), this).execute();
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -310,7 +600,6 @@ public class EditRecipe extends javax.swing.JFrame {
     private javax.swing.JButton buttAddIngredientToRecipe;
     private javax.swing.JButton buttCancel;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
@@ -327,5 +616,6 @@ public class EditRecipe extends javax.swing.JFrame {
     private javax.swing.JTable jTable1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel statLabel;
     // End of variables declaration//GEN-END:variables
 }

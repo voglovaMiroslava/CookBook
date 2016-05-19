@@ -62,9 +62,9 @@ public class MainForm extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        comboTimeTo = new javax.swing.JComboBox<>();
+        comboTimeTo = new javax.swing.JComboBox<String>();
         spinnerTimeTo = new javax.swing.JSpinner();
-        comboTimeFrom = new javax.swing.JComboBox<>();
+        comboTimeFrom = new javax.swing.JComboBox<String>();
         spinnerTimeFrom = new javax.swing.JSpinner();
         buttSearchRec = new javax.swing.JButton();
         fieldName = new javax.swing.JTextField();
@@ -72,7 +72,7 @@ public class MainForm extends javax.swing.JFrame {
         checkByDuration = new javax.swing.JCheckBox();
         checkByIngredients = new javax.swing.JCheckBox();
         checkByName = new javax.swing.JCheckBox();
-        comboSearchIngredients = new javax.swing.JComboBox<>();
+        comboSearchIngredients = new javax.swing.JComboBox<String>();
         jMenuBar1 = new javax.swing.JMenuBar();
         menuFile = new javax.swing.JMenu();
         menuShowRecipes = new javax.swing.JMenuItem();
@@ -267,7 +267,7 @@ public class MainForm extends javax.swing.JFrame {
         checkByName.setText(bundle.getString("searchByName")); // NOI18N
 
         comboSearchIngredients.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        comboSearchIngredients.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboSearchIngredients.setModel(new IngredientComboboxModel());
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);

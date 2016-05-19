@@ -21,7 +21,7 @@ public class DurationFormater {
         Long rem = 0l;
         Long days = abs(d.toDays());
         rem+= days*24l*60l;
-        Long hours = abs(d.toHours())-(rem*60l);
+        Long hours = abs(d.toHours())-(rem/60l);
         rem+= hours*60l;
         Long minutes = abs(d.toMinutes())-rem;
         StringBuilder b = new StringBuilder();

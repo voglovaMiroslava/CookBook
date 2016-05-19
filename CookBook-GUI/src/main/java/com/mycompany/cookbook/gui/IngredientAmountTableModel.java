@@ -3,6 +3,7 @@ package com.mycompany.cookbook.gui;
 
 import eu.dominiktousek.pv168.cookbook.Ingredient;
 import eu.dominiktousek.pv168.cookbook.IngredientAmount;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -54,6 +55,10 @@ public class IngredientAmountTableModel extends AbstractTableModel{
         }
         data.clear();
         fireTableRowsDeleted(0, lastIdx);
+    }
+    
+    public List<IngredientAmount> getAllData(){
+        return Collections.unmodifiableList(data);
     }
     
     public IngredientAmount getValueByRow(int rowIndex){
