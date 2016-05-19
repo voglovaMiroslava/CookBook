@@ -30,7 +30,7 @@ public class EditRecipe extends javax.swing.JFrame {
 
     final static Logger LOG = LoggerFactory.getLogger(RecipeDetail.class);
     
-    private final Long recipeId;
+    private Long recipeId;
     private final ResourceBundle bundle;
     
     private boolean recipeLoaded = false;
@@ -164,7 +164,8 @@ public class EditRecipe extends javax.swing.JFrame {
         protected void done() {   
             try {
                 if(get()){
-                    parentForm.dispose();
+                    recipeId = recipe.getId();
+                    loadData();
                 }else{
                     JOptionPane.showMessageDialog(parentForm, bundle.getString("saving failed"),"",JOptionPane.ERROR_MESSAGE);
                 }
@@ -214,7 +215,9 @@ public class EditRecipe extends javax.swing.JFrame {
     
     private void loadingDone(){
         statLabel.setText("");
-        buttAddIngredientToRecipe.setEnabled(true);
+        if(recipeId!=null){
+            buttAddIngredientToRecipe.setEnabled(true);
+        }
         jButton1.setEnabled(true);
         jTextArea1.setEnabled(true);
         jTextField1.setEnabled(true);
@@ -322,6 +325,7 @@ public class EditRecipe extends javax.swing.JFrame {
 
         buttAddIngredientToRecipe.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         buttAddIngredientToRecipe.setText(bundle.getString("addIngredient")); // NOI18N
+        buttAddIngredientToRecipe.setEnabled(false);
         buttAddIngredientToRecipe.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttAddIngredientToRecipeActionPerformed(evt);
