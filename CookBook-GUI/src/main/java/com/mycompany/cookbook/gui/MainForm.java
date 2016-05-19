@@ -1,7 +1,24 @@
 package com.mycompany.cookbook.gui;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.time.Duration;
+import eu.dominiktousek.pv168.cookbook.Ingredient;
+import eu.dominiktousek.pv168.cookbook.IngredientAmount;
+import eu.dominiktousek.pv168.cookbook.IngredientAmountManagerImpl;
+import eu.dominiktousek.pv168.cookbook.IngredientManagerImpl;
+import eu.dominiktousek.pv168.cookbook.Recipe;
+import eu.dominiktousek.pv168.cookbook.RecipeManagerImpl;
+import eu.dominiktousek.pv168.cookbook.ServiceFailureException;
+import java.sql.SQLException;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import javax.swing.ComboBoxModel;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 
 /**
  *
@@ -31,33 +48,33 @@ public class MainForm extends javax.swing.JFrame {
         tabbedPanel = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
+        tableIngredient = new javax.swing.JTable();
         buttRemoveIng = new javax.swing.JButton();
         buttEditIng = new javax.swing.JButton();
         buttSearchIng = new javax.swing.JButton();
         buttAddIng = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        fieldIngredientName = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         buttShowDetail = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
+        tableRecipe = new javax.swing.JTable();
+        buttRemoveRecipe = new javax.swing.JButton();
         buttAddRecipe = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jComboBox2 = new javax.swing.JComboBox<>();
-        jTextField1 = new javax.swing.JTextField();
-        jSpinner3 = new javax.swing.JSpinner();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jSpinner1 = new javax.swing.JSpinner();
+        comboTimeTo = new javax.swing.JComboBox<>();
+        spinnerTimeTo = new javax.swing.JSpinner();
+        comboTimeFrom = new javax.swing.JComboBox<>();
+        spinnerTimeFrom = new javax.swing.JSpinner();
         buttSearchRec = new javax.swing.JButton();
-        jTextField3 = new javax.swing.JTextField();
+        fieldName = new javax.swing.JTextField();
         buttSelectIng = new javax.swing.JButton();
-        jCheckBox1 = new javax.swing.JCheckBox();
-        jCheckBox2 = new javax.swing.JCheckBox();
-        jCheckBox3 = new javax.swing.JCheckBox();
+        checkByDuration = new javax.swing.JCheckBox();
+        checkByIngredients = new javax.swing.JCheckBox();
+        checkByName = new javax.swing.JCheckBox();
+        comboSearchIngredients = new javax.swing.JComboBox<>();
         jMenuBar1 = new javax.swing.JMenuBar();
         menuFile = new javax.swing.JMenu();
         menuShowRecipes = new javax.swing.JMenuItem();
@@ -71,33 +88,19 @@ public class MainForm extends javax.swing.JFrame {
 
         tabbedPanel.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
 
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {"kuřecí maso"},
-                {"paprika"},
-                {"citrón"},
-                {"rajče"}
-            },
-            new String [] {
-                "Ingredient's name"
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jScrollPane2.setViewportView(jTable2);
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle"); // NOI18N
-        if (jTable2.getColumnModel().getColumnCount() > 0) {
-            jTable2.getColumnModel().getColumn(0).setHeaderValue(bundle.getString("ingredientName")); // NOI18N
-        }
+        tableIngredient.setModel(new IngredientTableModel());
+        tableIngredient.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        buttSearchIngActionPerformed(new java.awt.event.ActionEvent(new Object(), 0, "click"));
+        jScrollPane2.setViewportView(tableIngredient);
 
         buttRemoveIng.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle"); // NOI18N
         buttRemoveIng.setText(bundle.getString("removeIngredient")); // NOI18N
+        buttRemoveIng.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttRemoveIngActionPerformed(evt);
+            }
+        });
 
         buttEditIng.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         buttEditIng.setText(bundle.getString("editIngredient")); // NOI18N
@@ -109,6 +112,11 @@ public class MainForm extends javax.swing.JFrame {
 
         buttSearchIng.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         buttSearchIng.setText(bundle.getString("search")); // NOI18N
+        buttSearchIng.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttSearchIngActionPerformed(evt);
+            }
+        });
 
         buttAddIng.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         buttAddIng.setText(bundle.getString("addNew")); // NOI18N
@@ -121,9 +129,9 @@ public class MainForm extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         jLabel2.setText(bundle.getString("searchByName")); // NOI18N
 
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+        fieldIngredientName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
+                fieldIngredientNameActionPerformed(evt);
             }
         });
 
@@ -138,7 +146,7 @@ public class MainForm extends javax.swing.JFrame {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addGap(1, 1, 1)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(fieldIngredientName, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(buttSearchIng, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 296, Short.MAX_VALUE)
@@ -162,13 +170,13 @@ public class MainForm extends javax.swing.JFrame {
                     .addComponent(buttSearchIng)
                     .addComponent(buttAddIng)
                     .addComponent(jLabel2)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(fieldIngredientName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 635, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
-        jPanel2Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {buttAddIng, buttEditIng, buttRemoveIng, buttSearchIng, jTextField2});
+        jPanel2Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {buttAddIng, buttEditIng, buttRemoveIng, buttSearchIng, fieldIngredientName});
 
         tabbedPanel.addTab(bundle.getString("ingredients"), jPanel2); // NOI18N
 
@@ -180,37 +188,20 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {"Řecký salát", "rajče, mrkev,..", "Umyjte rajčata...", "20 min"},
-                {"Kuřecí na citrónu", "kuře, citrón,...", "Připravte kuřecí..", "45 min"},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Name", "Ingredients", "Description", "Duration"
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false
-            };
+        tableRecipe.setModel(new RecipeTableModel());
+        tableRecipe.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tableRecipe.setAutoscrolls(false);
+        tableRecipe.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        buttSearchRecActionPerformed(new java.awt.event.ActionEvent(new Object(),0,"click"));
+        jScrollPane1.setViewportView(tableRecipe);
 
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
+        buttRemoveRecipe.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        buttRemoveRecipe.setText(bundle.getString("removeRecipe")); // NOI18N
+        buttRemoveRecipe.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttRemoveRecipeActionPerformed(evt);
             }
         });
-        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        jTable1.setAutoscrolls(false);
-        jScrollPane1.setViewportView(jTable1);
-        if (jTable1.getColumnModel().getColumnCount() > 0) {
-            jTable1.getColumnModel().getColumn(0).setHeaderValue(bundle.getString("name")); // NOI18N
-            jTable1.getColumnModel().getColumn(1).setHeaderValue(bundle.getString("ingredients")); // NOI18N
-            jTable1.getColumnModel().getColumn(2).setHeaderValue(bundle.getString("description")); // NOI18N
-            jTable1.getColumnModel().getColumn(3).setHeaderValue(bundle.getString("duration")); // NOI18N
-        }
-
-        jButton1.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jButton1.setText(bundle.getString("removeRecipe")); // NOI18N
 
         buttAddRecipe.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         buttAddRecipe.setText(bundle.getString("addNewRecipe")); // NOI18N
@@ -228,18 +219,24 @@ public class MainForm extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         jLabel4.setText(bundle.getString("from")); // NOI18N
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { bundle.getString("minute(s)"), bundle.getString("hour(s)"), bundle.getString("day(s)") }));
+        comboTimeTo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { bundle.getString("minute(s)"), bundle.getString("hour(s)"), bundle.getString("day(s)") }));
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { bundle.getString("minute(s)"), bundle.getString("hour(s)"), bundle.getString("day(s)") }));
+        comboTimeFrom.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { bundle.getString("minute(s)"), bundle.getString("hour(s)"), bundle.getString("day(s)") }));
 
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel());
+        spinnerTimeFrom.setModel(new javax.swing.SpinnerNumberModel());
 
         buttSearchRec.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         buttSearchRec.setText(bundle.getString("search")); // NOI18N
-
-        jTextField3.addActionListener(new java.awt.event.ActionListener() {
+        buttSearchRec.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField3ActionPerformed(evt);
+                buttSearchRecActionPerformed(evt);
+            }
+        });
+
+        fieldName.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        fieldName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fieldNameActionPerformed(evt);
             }
         });
 
@@ -251,20 +248,23 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
-        jCheckBox1.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jCheckBox1.setText(bundle.getString("searchByDuration")); // NOI18N
-        jCheckBox1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+        checkByDuration.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        checkByDuration.setText(bundle.getString("searchByDuration")); // NOI18N
+        checkByDuration.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        checkByDuration.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox1ActionPerformed(evt);
+                checkByDurationActionPerformed(evt);
             }
         });
 
-        jCheckBox2.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jCheckBox2.setText(bundle.getString("searchByIngredients")); // NOI18N
+        checkByIngredients.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        checkByIngredients.setText(bundle.getString("searchByIngredients")); // NOI18N
 
-        jCheckBox3.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jCheckBox3.setText(bundle.getString("searchByName")); // NOI18N
+        checkByName.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        checkByName.setText(bundle.getString("searchByName")); // NOI18N
+
+        comboSearchIngredients.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        comboSearchIngredients.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -272,36 +272,36 @@ public class MainForm extends javax.swing.JFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jCheckBox2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jCheckBox3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(checkByIngredients, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(checkByDuration, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(checkByName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(17, 17, 17)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(fieldName, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(jLabel4)
                                 .addGap(6, 6, 6)
-                                .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(spinnerTimeFrom, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, 0)
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(comboTimeFrom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel5)
                                 .addGap(6, 6, 6)
-                                .addComponent(jSpinner3, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(spinnerTimeTo, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, 0)
-                                .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(comboTimeTo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(comboSearchIngredients, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(buttSelectIng)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 210, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 204, Short.MAX_VALUE)
                         .addComponent(buttSearchRec))))
         );
 
-        jPanel3Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jTextField1, jTextField3});
+        jPanel3Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {comboSearchIngredients, fieldName});
 
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -310,32 +310,32 @@ public class MainForm extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jCheckBox3)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(checkByName)
+                            .addComponent(fieldName, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(8, 8, 8)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSpinner1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(spinnerTimeFrom, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(comboTimeFrom, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(comboTimeTo, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(jLabel4)
                                 .addComponent(jLabel5)
-                                .addComponent(jCheckBox1))
-                            .addComponent(jSpinner3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(checkByDuration))
+                            .addComponent(spinnerTimeTo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(5, 5, 5)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(buttSelectIng)
-                            .addComponent(jCheckBox2))
-                        .addContainerGap(24, Short.MAX_VALUE))
+                            .addComponent(checkByIngredients)
+                            .addComponent(comboSearchIngredients, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(25, Short.MAX_VALUE))
                     .addComponent(buttSearchRec, javax.swing.GroupLayout.Alignment.TRAILING)))
         );
 
-        jPanel3Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {buttSearchRec, jTextField1});
-
         jPanel3Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jLabel4, jLabel5});
 
-        jPanel3Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jSpinner1, jSpinner3});
+        jPanel3Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {spinnerTimeFrom, spinnerTimeTo});
+
+        jPanel3Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {comboSearchIngredients, fieldName});
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -352,12 +352,12 @@ public class MainForm extends javax.swing.JFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addComponent(buttShowDetail)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jButton1))
+                                .addComponent(buttRemoveRecipe))
                             .addComponent(buttAddRecipe, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addContainerGap())
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {buttAddRecipe, buttShowDetail, jButton1});
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {buttAddRecipe, buttRemoveRecipe, buttShowDetail});
 
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -369,7 +369,7 @@ public class MainForm extends javax.swing.JFrame {
                         .addComponent(buttAddRecipe)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton1)
+                            .addComponent(buttRemoveRecipe)
                             .addComponent(buttShowDetail)))
                     .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(14, 14, 14)
@@ -464,26 +464,25 @@ public class MainForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void menuAddRecipeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuAddRecipeActionPerformed
-        javax.swing.JFrame editRec = new EditRecipe();
-        editRec.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        editRec.setVisible(true);
+        buttAddRecipeActionPerformed(evt);
     }//GEN-LAST:event_menuAddRecipeActionPerformed
 
     private void buttEditIngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttEditIngActionPerformed
-        // TODO add your handling code here:
+        
+
     }//GEN-LAST:event_buttEditIngActionPerformed
 
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+    private void fieldIngredientNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldIngredientNameActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
+    }//GEN-LAST:event_fieldIngredientNameActionPerformed
 
-    private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
+    private void fieldNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldNameActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField3ActionPerformed
+    }//GEN-LAST:event_fieldNameActionPerformed
 
-    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+    private void checkByDurationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkByDurationActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jCheckBox1ActionPerformed
+    }//GEN-LAST:event_checkByDurationActionPerformed
 
     private void menuShowRecipesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuShowRecipesMouseClicked
     }//GEN-LAST:event_menuShowRecipesMouseClicked
@@ -501,9 +500,7 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_menuExitActionPerformed
 
     private void menuAddIngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuAddIngActionPerformed
-        javax.swing.JFrame editIng = new AddEditIngredient();
-        editIng.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        editIng.setVisible(true);
+        buttAddIngActionPerformed(evt);
     }//GEN-LAST:event_menuAddIngActionPerformed
 
     private void buttSelectIngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttSelectIngActionPerformed
@@ -513,13 +510,20 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_buttSelectIngActionPerformed
 
     private void buttShowDetailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttShowDetailActionPerformed
-        javax.swing.JFrame recDetail = new RecipeDetail();
+        RecipeTableModel tabMod = (RecipeTableModel) tableRecipe.getModel();
+        int rowNum = tableRecipe.getSelectedRow();
+        if (rowNum == -1) {
+            return;
+        }
+        Recipe rec = tabMod.getValueByRow(rowNum);
+
+        javax.swing.JFrame recDetail = new RecipeDetail(rec.getId());
         recDetail.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         recDetail.setVisible(true);
     }//GEN-LAST:event_buttShowDetailActionPerformed
 
     private void buttAddRecipeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttAddRecipeActionPerformed
-        javax.swing.JFrame editRec = new EditRecipe();
+        javax.swing.JFrame editRec = new EditRecipe(null);
         editRec.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         editRec.setVisible(true);
     }//GEN-LAST:event_buttAddRecipeActionPerformed
@@ -529,6 +533,132 @@ public class MainForm extends javax.swing.JFrame {
         editIng.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         editIng.setVisible(true);
     }//GEN-LAST:event_buttAddIngActionPerformed
+
+    private static List<java.awt.Component> getAllComponents(final java.awt.Container c) {
+        java.awt.Component[] comps = c.getComponents();
+        List<java.awt.Component> compList = new ArrayList<>();
+        for (java.awt.Component comp : comps) {
+            compList.add(comp);
+            if (comp instanceof java.awt.Container) {
+                compList.addAll(getAllComponents((java.awt.Container) comp));
+            }
+        }
+        return compList;
+    }
+
+    private Duration makeDuration(Integer number, String unit) {
+        if (number == 0) {
+            return null;
+        }
+
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle");
+
+        if (unit.equals(bundle.getString("minute(s)"))) {
+            return Duration.ofMinutes(number);
+        }
+        if (unit.equals(bundle.getString("hour(s)"))) {
+            return Duration.ofHours(number);
+        }
+
+        return Duration.ofDays(number);
+    }
+
+    private List<Ingredient> makeIngredients() {
+        List<Ingredient> ingrs = new ArrayList<>();
+
+        ComboBoxModel model = comboSearchIngredients.getModel();
+        int size = model.getSize();
+        for (int i = 0; i < size; i++) {
+            Ingredient element = (Ingredient) model.getElementAt(i);
+            ingrs.add(element);
+        }
+
+        return ingrs;
+    }
+
+
+    private void buttSearchRecActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttSearchRecActionPerformed
+        ((RecipeTableModel) tableRecipe.getModel()).clear();
+
+        String name = "";
+        Duration from = null;
+        Duration to = null;
+        List<Ingredient> ingrs = new ArrayList<>();
+
+        if (checkByDuration.isSelected()) {
+            Integer fromInt = (Integer) spinnerTimeFrom.getValue();
+            String fromString = (String) comboTimeFrom.getSelectedItem();
+            Integer toInt = (Integer) spinnerTimeTo.getValue();
+            String toString = (String) comboTimeTo.getSelectedItem();
+            from = makeDuration(fromInt, fromString);
+            to = makeDuration(toInt, toString);
+        }
+
+        if (checkByIngredients.isSelected()) {
+            ingrs = makeIngredients();
+        }
+
+        if (checkByName.isSelected()) {
+            name = fieldName.getText();
+        }
+
+        new SearchRecipeWorker(name, from, to, ingrs).execute();
+    }//GEN-LAST:event_buttSearchRecActionPerformed
+
+    private void buttSearchIngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttSearchIngActionPerformed
+        ((IngredientTableModel) tableIngredient.getModel()).clear();
+
+        String name = fieldIngredientName.getText();
+        new SearchIngredientWorker(name).execute();
+    }//GEN-LAST:event_buttSearchIngActionPerformed
+
+    private int messageDialog() {
+
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle");
+        Object[] options = {bundle.getString("yes"), bundle.getString("no")};
+
+        int n = JOptionPane.showOptionDialog(this, bundle.getString("confirm delete"), "",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[1]);
+
+        return n;
+    }
+
+    private void buttRemoveIngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttRemoveIngActionPerformed
+        int rowNum = tableIngredient.getSelectedRow();
+        if (rowNum == -1) {
+            return;
+        }
+
+        if (messageDialog() == 1) {
+            return;
+        }
+
+        IngredientTableModel model = (IngredientTableModel) tableIngredient.getModel();
+        Long ingId = model.getValueByRow(rowNum).getId();
+
+        (new RemoveIngredientWorker(ingId, this)).execute();
+
+    }//GEN-LAST:event_buttRemoveIngActionPerformed
+
+    private void buttRemoveRecipeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttRemoveRecipeActionPerformed
+        int rowNum = tableRecipe.getSelectedRow();
+        if (rowNum == -1) {
+            return;
+        }
+
+        if (messageDialog() == 1) {
+            return;
+        }
+
+        RecipeTableModel model = (RecipeTableModel) tableRecipe.getModel();
+        Long ingId = model.getValueByRow(rowNum).getId();
+
+        (new RemoveRecipeWorker(ingId)).execute();
+    }//GEN-LAST:event_buttRemoveRecipeActionPerformed
 
     /**
      * @param args the command line arguments
@@ -554,12 +684,9 @@ public class MainForm extends javax.swing.JFrame {
 
         //</editor-fold>
         //</editor-fold>
-
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainForm().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new MainForm().setVisible(true);
         });
     }
 
@@ -568,17 +695,20 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton buttAddRecipe;
     private javax.swing.JButton buttEditIng;
     private javax.swing.JButton buttRemoveIng;
+    private javax.swing.JButton buttRemoveRecipe;
     private javax.swing.JButton buttSearchIng;
     private javax.swing.JButton buttSearchRec;
     private javax.swing.JButton buttSelectIng;
     private javax.swing.JButton buttShowDetail;
+    private javax.swing.JCheckBox checkByDuration;
+    private javax.swing.JCheckBox checkByIngredients;
+    private javax.swing.JCheckBox checkByName;
+    private javax.swing.JComboBox<String> comboSearchIngredients;
+    private javax.swing.JComboBox<String> comboTimeFrom;
+    private javax.swing.JComboBox<String> comboTimeTo;
+    private javax.swing.JTextField fieldIngredientName;
+    private javax.swing.JTextField fieldName;
     private javax.swing.Box.Filler filler2;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JCheckBox jCheckBox2;
-    private javax.swing.JCheckBox jCheckBox3;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox2;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -588,13 +718,6 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JSpinner jSpinner3;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTable jTable2;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
     private javax.swing.JMenuItem menuAddIng;
     private javax.swing.JMenuItem menuAddRecipe;
     private javax.swing.JMenu menuEdit;
@@ -602,6 +725,141 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JMenu menuFile;
     private javax.swing.JMenuItem menuShowIngredience;
     private javax.swing.JMenuItem menuShowRecipes;
+    private javax.swing.JSpinner spinnerTimeFrom;
+    private javax.swing.JSpinner spinnerTimeTo;
     private javax.swing.JTabbedPane tabbedPanel;
+    private javax.swing.JTable tableIngredient;
+    private javax.swing.JTable tableRecipe;
     // End of variables declaration//GEN-END:variables
+
+    private class SearchRecipeWorker extends SwingWorker<List<Recipe>, Void> {
+
+        private String name;
+        private Duration from;
+        private Duration to;
+        private List<Ingredient> ingrs;
+
+        public SearchRecipeWorker(String name, Duration from, Duration to, List<Ingredient> ingrs) {
+            this.name = name;
+            this.from = from;
+            this.to = to;
+            this.ingrs = ingrs;
+        }
+
+        @Override
+        protected List<Recipe> doInBackground() throws Exception {
+            return new RecipeManagerImpl().search(name, from, to, ingrs);
+        }
+
+        @Override
+        protected void done() {
+            RecipeTableModel model = (RecipeTableModel) tableRecipe.getModel();
+            try {
+                List<Recipe> recipes = this.get();
+
+                for (Recipe rec : recipes) {
+                    model.addItem(rec);
+                }
+            } catch (InterruptedException | ExecutionException ex) {
+                LOG.error(ex.getMessage());
+            }
+
+        }
+    }
+
+    private class SearchIngredientWorker extends SwingWorker<List<Ingredient>, Void> {
+
+        private String name;
+
+        public SearchIngredientWorker(String name) {
+            this.name = name;
+        }
+
+        @Override
+        protected List<Ingredient> doInBackground() throws Exception {
+            return new IngredientManagerImpl().searchByName(name);
+        }
+
+        @Override
+        protected void done() {
+            IngredientTableModel model = (IngredientTableModel) tableIngredient.getModel();
+            try {
+                List<Ingredient> ingres = this.get();
+
+                for (Ingredient ing : ingres) {
+                    model.addItem(ing);
+                }
+            } catch (InterruptedException | ExecutionException ex) {
+                LOG.error(ex.getMessage());
+            }
+
+        }
+
+    }
+
+    private class RemoveIngredientWorker extends SwingWorker<Integer, Void> {
+
+        private Long id;
+        private JFrame frame;
+
+        public RemoveIngredientWorker(Long id, JFrame frame) {
+            this.id = id;
+            this.frame = frame;
+        }
+
+        @Override
+        protected Integer doInBackground() throws Exception {
+            try {
+                (new IngredientManagerImpl()).deleteIngredient(id);
+                return 1;
+            } catch (ServiceFailureException ex) {
+                return null;
+            }
+        }
+
+        @Override
+        protected void done() {
+            java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle");
+            try {
+                Integer corr = this.get();
+                if (corr == null) {
+                    JOptionPane.showMessageDialog(frame,
+                            bundle.getString("ingredient in use"),
+                            "",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+
+            } catch (InterruptedException | ExecutionException ex) {
+                LOG.error(ex.getMessage());
+            }
+
+            buttSearchIngActionPerformed(new java.awt.event.ActionEvent(new Object(), 0, "command"));
+        }
+    }
+
+    private class RemoveRecipeWorker extends SwingWorker<Integer, Void> {
+
+        private Long id;
+
+        public RemoveRecipeWorker(Long id) {
+            this.id = id;
+        }
+
+        @Override
+        protected Integer doInBackground() throws Exception {
+            IngredientAmountManagerImpl man = new IngredientAmountManagerImpl();
+            List<IngredientAmount> list = man.getIngredientsByRecipe(id);
+            for (IngredientAmount amount : list) {
+                man.deleteIngredientFromRecipe(amount.getId());
+            }
+
+            (new RecipeManagerImpl()).deleteRecipe(id);
+            return null;
+        }
+
+        @Override
+        protected void done() {
+            buttSearchRecActionPerformed(new java.awt.event.ActionEvent(new Object(), 0, "command"));
+        }
+    }
 }
