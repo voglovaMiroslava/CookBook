@@ -5,43 +5,32 @@
  */
 package com.mycompany.cookbook.gui;
 
-import javax.swing.AbstractListModel;
+import eu.dominiktousek.pv168.cookbook.Ingredient;
+import eu.dominiktousek.pv168.cookbook.IngredientManagerImpl;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
-import javax.swing.ListModel;
+import javax.swing.SwingWorker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Dominik
  */
 public class FilterByIngredientForm extends javax.swing.JFrame {
-    private ListModel selectedIngredients;
-    private ListModel allIngredients;
-    
+
+    private IngredientFormFilterModel selectedIngredients;
+
+    final static Logger LOG = LoggerFactory.getLogger(MainForm.class);
+
     /**
      * Creates new form MainForm
      */
     public FilterByIngredientForm() {
-        selectedIngredients = new DefaultListModel();
-        ((DefaultListModel)selectedIngredients).addElement("Cibule");
-        ((DefaultListModel)selectedIngredients).addElement("Pórek");
-        ((DefaultListModel)selectedIngredients).addElement("Brambory");
-        ((DefaultListModel)selectedIngredients).addElement("Mrkev");
-        
-        allIngredients = new AbstractListModel() {
-            String[] strings = { 
-                "Kopřiva", 
-                "Pantofel",
-                "Cukr",
-                "Kukuřice",
-                "Řepa",
-                "Salát",
-                "Okurka"
-            };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        };
         initComponents();
+        selectedIngredients = (IngredientFormFilterModel) jList2.getModel();
     }
 
     /**
@@ -54,30 +43,23 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
     private void initComponents() {
 
         panel1 = new java.awt.Panel();
-        jLabel1 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList();
+        fieldName = new javax.swing.JTextField();
         jScrollPane2 = new javax.swing.JScrollPane();
         jList2 = new javax.swing.JList();
-        jButton1 = new javax.swing.JButton();
+        buttAddToFilter = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         buttCancel = new javax.swing.JButton();
+        buttSearch = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tableIngredient = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(500, 280));
         setPreferredSize(new java.awt.Dimension(500, 280));
 
-        jLabel1.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle"); // NOI18N
-        jLabel1.setText(bundle.getString("search")); // NOI18N
+        fieldName.setToolTipText("Type here your search query");
 
-        jTextField2.setToolTipText("Type here your search query");
-
-        jList1.setModel(allIngredients);
-        jScrollPane1.setViewportView(jList1);
-
-        jList2.setModel(selectedIngredients);
+        jList2.setModel(new IngredientFormFilterModel());
         jList2.setCellRenderer(new CheckboxListCellRenderer());
         jList2.setName(""); // NOI18N
         jList2.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
@@ -87,11 +69,22 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(jList2);
 
-        jButton1.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jButton1.setText(bundle.getString("addToFilter")); // NOI18N
+        buttAddToFilter.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle"); // NOI18N
+        buttAddToFilter.setText(bundle.getString("addToFilter")); // NOI18N
+        buttAddToFilter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttAddToFilterActionPerformed(evt);
+            }
+        });
 
         jButton2.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         jButton2.setText(bundle.getString("ok")); // NOI18N
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         buttCancel.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
         buttCancel.setText(bundle.getString("cancel")); // NOI18N
@@ -101,6 +94,17 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
             }
         });
 
+        buttSearch.setText(bundle.getString("search")); // NOI18N
+        buttSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttSearchActionPerformed(evt);
+            }
+        });
+
+        tableIngredient.setModel(new IngredientTableModel()
+        );
+        jScrollPane3.setViewportView(tableIngredient);
+
         javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);
         panel1.setLayout(panel1Layout);
         panel1Layout.setHorizontalGroup(
@@ -109,35 +113,34 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panel1Layout.createSequentialGroup()
-                        .addComponent(jButton1)
+                        .addComponent(buttAddToFilter)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(buttCancel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton2))
                     .addGroup(panel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE))
+                        .addComponent(fieldName)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(buttSearch))
                     .addGroup(panel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(4, 4, 4)
-                        .addComponent(jTextField2)))
-                .addContainerGap())
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(8, 8, 8)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE))))
         );
         panel1Layout.setVerticalGroup(
             panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(fieldName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttSearch))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane2)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
                 .addGroup(panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
+                    .addComponent(buttAddToFilter)
                     .addComponent(jButton2)
                     .addComponent(buttCancel))
                 .addContainerGap())
@@ -150,7 +153,7 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(panel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGap(10, 10, 10))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -165,16 +168,41 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
 
     private void removeChckbox(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_removeChckbox
         JList list = (JList) evt.getSource();
-        if(list.getSelectedIndex()<0) return;
-        
-        DefaultListModel model = (DefaultListModel) list.getModel();
+        if (list.getSelectedIndex() < 0) {
+            return;
+        }
+
+        IngredientFormFilterModel model = (IngredientFormFilterModel) list.getModel();
         model.removeElementAt(list.getSelectedIndex());
-        
+
     }//GEN-LAST:event_removeChckbox
 
     private void buttCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttCancelActionPerformed
         super.dispose();
     }//GEN-LAST:event_buttCancelActionPerformed
+
+    private void buttSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttSearchActionPerformed
+        ((IngredientTableModel) tableIngredient.getModel()).clear();
+        String name = fieldName.getText();
+        (new SearchIngredientWorker(name)).execute();
+    }//GEN-LAST:event_buttSearchActionPerformed
+
+    private void buttAddToFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttAddToFilterActionPerformed
+        int rowNum = tableIngredient.getSelectedRow();
+        if (rowNum == -1) {
+            return;
+        }
+        IngredientTableModel model = (IngredientTableModel) tableIngredient.getModel();
+        selectedIngredients.addItem(model.getValueByRow(rowNum));
+       
+
+    }//GEN-LAST:event_buttAddToFilterActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // take all items and give them somewhere
+        
+        this.dispose();
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -215,15 +243,46 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttAddToFilter;
     private javax.swing.JButton buttCancel;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton buttSearch;
+    private javax.swing.JTextField fieldName;
     private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JList jList1;
     private javax.swing.JList jList2;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JScrollPane jScrollPane3;
     private java.awt.Panel panel1;
+    private javax.swing.JTable tableIngredient;
     // End of variables declaration//GEN-END:variables
+
+    private class SearchIngredientWorker extends SwingWorker<List<Ingredient>, Void> {
+
+        private String name;
+
+        public SearchIngredientWorker(String name) {
+            this.name = name;
+        }
+
+        @Override
+        protected List<Ingredient> doInBackground() throws Exception {
+            return new IngredientManagerImpl().searchByName(name);
+        }
+
+        @Override
+        protected void done() {
+            IngredientTableModel model = (IngredientTableModel) tableIngredient.getModel();
+            try {
+                List<Ingredient> ingres = this.get();
+
+                for (Ingredient ing : ingres) {
+                    model.addItem(ing);
+                }
+            } catch (InterruptedException | ExecutionException ex) {
+                LOG.error(ex.getMessage());
+            }
+
+        }
+
+    }
+
 }
