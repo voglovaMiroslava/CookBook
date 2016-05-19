@@ -5,6 +5,7 @@ import eu.dominiktousek.pv168.cookbook.Ingredient;
 import eu.dominiktousek.pv168.cookbook.IngredientAmount;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -14,6 +15,7 @@ import javax.swing.table.AbstractTableModel;
 public class IngredientAmountTableModel extends AbstractTableModel{
     
     private final List<IngredientAmount> data = new LinkedList<>();
+    private final ResourceBundle bundle = ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle");
     
     @Override
     public int getRowCount() {
@@ -43,6 +45,31 @@ public class IngredientAmountTableModel extends AbstractTableModel{
         data.add(item);
         int changedRow = data.size()-1;
         fireTableRowsInserted(changedRow, changedRow);
+    }
+    
+    public void clear(){
+        int lastIdx = data.size()-1;
+        if(lastIdx<0){
+            return;
+        }
+        data.clear();
+        fireTableRowsDeleted(0, lastIdx);
+    }
+    
+    public IngredientAmount getValueByRow(int rowIndex){
+        return data.get(rowIndex);
+    }
+    
+    @Override
+    public String getColumnName(int columnIndex) {
+        switch (columnIndex) {
+            case 0:
+                return bundle.getString("name");
+            case 1:
+                return bundle.getString("amount");
+            default:
+                throw new IllegalArgumentException("columnIndex");
+        }
     }
     
     @Override
