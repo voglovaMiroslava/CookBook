@@ -54,7 +54,7 @@ public class RecipeDetail extends javax.swing.JFrame {
             try {
                 Recipe recipe = this.get();
                 jLabel1.setText(recipe.getName());
-                jLabel2.setText(DurationFormater.format(recipe.getDuration()));
+                jLabel2.setText(bundle.getString("duration") + ": "+DurationFormater.format(recipe.getDuration()));
                 jTextArea1.setText(recipe.getInstructions());
                 recipeLoaded = true;
                 if(ingredientsLoaded){

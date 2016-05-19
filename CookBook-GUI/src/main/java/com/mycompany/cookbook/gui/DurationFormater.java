@@ -20,12 +20,12 @@ public class DurationFormater {
     public static String format(Duration d){
         Long rem = 0l;
         Long days = abs(d.toDays());
-        rem+= days*26l*60l;
+        rem+= days*24l*60l;
         Long hours = abs(d.toHours())-(rem*60l);
         rem+= hours*60l;
         Long minutes = abs(d.toMinutes())-rem;
-        StringBuilder b = new StringBuilder(bundle.getString("duration"));
-        b.append(": ");
+        StringBuilder b = new StringBuilder();
+        //b.append(": ");
         if(days>0){
             b.append(days.toString());
             b.append(" ");

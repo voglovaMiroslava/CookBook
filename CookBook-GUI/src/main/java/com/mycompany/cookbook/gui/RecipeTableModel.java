@@ -48,9 +48,12 @@ public class RecipeTableModel extends AbstractTableModel {
     }
     
     public void clear(){
-        int oldSize = data.size();
+        int lastIdx = data.size()-1;
+        if(lastIdx<0){
+            return;
+        }
         data.clear();
-        fireTableRowsDeleted(0, oldSize-1);
+        fireTableRowsDeleted(0, lastIdx);
     }
     
     public Recipe getValueByRow(int rowIndex){
