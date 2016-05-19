@@ -48,4 +48,8 @@ public class IngredientFormFilterModel extends AbstractListModel {
             fireIntervalRemoved(this, index, index);
         }
     }
+    
+    public List<Ingredient> getAll(){
+        return items;
+    }
 }

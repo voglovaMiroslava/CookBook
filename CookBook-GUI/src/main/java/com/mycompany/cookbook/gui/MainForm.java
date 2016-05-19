@@ -531,7 +531,7 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_menuAddIngActionPerformed
 
     private void buttSelectIngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttSelectIngActionPerformed
-        javax.swing.JFrame ingFilter = new FilterByIngredientForm();
+        javax.swing.JFrame ingFilter = new FilterByIngredientForm(this);
         ingFilter.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         ingFilter.setVisible(true);
     }//GEN-LAST:event_buttSelectIngActionPerformed
@@ -593,12 +593,8 @@ public class MainForm extends javax.swing.JFrame {
     private List<Ingredient> makeIngredients() {
         List<Ingredient> ingrs = new ArrayList<>();
 
-        ComboBoxModel model = comboSearchIngredients.getModel();
-        int size = model.getSize();
-        for (int i = 0; i < size; i++) {
-            Ingredient element = (Ingredient) model.getElementAt(i);
-            ingrs.add(element);
-        }
+        IngredientComboboxModel model = (IngredientComboboxModel) comboSearchIngredients.getModel();
+        ingrs.addAll(model.getAllItems());
 
         return ingrs;
     }

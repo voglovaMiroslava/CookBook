@@ -33,11 +33,15 @@ public class IngredientComboboxModel extends AbstractListModel implements ComboB
     }
     
     public void addItem(Ingredient item){
+        int idx = items.size();
         items.add(item);
+        fireIntervalAdded(this, idx, idx);
     }
     
     public void clear(){
+        int size = items.size();
         items.clear();
+        fireIntervalRemoved(this, 0, size-1);
     }
     
     public List<Ingredient> getAllItems(){
@@ -50,12 +54,12 @@ public class IngredientComboboxModel extends AbstractListModel implements ComboB
 
     @Override
     public void setSelectedItem(Object anItem) {
-        selected = (Ingredient) anItem;
+        return;
     }
 
     @Override
     public Object getSelectedItem() {
-        return selected;
+        return null;
     }
     
 }

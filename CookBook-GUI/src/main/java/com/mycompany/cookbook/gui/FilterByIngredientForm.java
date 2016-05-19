@@ -7,6 +7,7 @@ package com.mycompany.cookbook.gui;
 
 import eu.dominiktousek.pv168.cookbook.Ingredient;
 import eu.dominiktousek.pv168.cookbook.IngredientManagerImpl;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JList;
@@ -23,7 +24,7 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
     private IngredientFormFilterModel selectedIngredients;
 
     final static Logger LOG = LoggerFactory.getLogger(MainForm.class);
-    
+
     private MainForm form;
 
     /**
@@ -200,13 +201,14 @@ public class FilterByIngredientForm extends javax.swing.JFrame {
         }
         IngredientTableModel model = (IngredientTableModel) tableIngredient.getModel();
         selectedIngredients.addItem(model.getValueByRow(rowNum));
-       
+
 
     }//GEN-LAST:event_buttAddToFilterActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // take all items and give them somewhere
-        
+
+        form.setIngredientFilter(selectedIngredients.getAll());
+
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 

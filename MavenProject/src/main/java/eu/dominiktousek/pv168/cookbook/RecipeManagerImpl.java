@@ -268,11 +268,12 @@ public class RecipeManagerImpl implements RecipeManager {
             boolean first = true;
             for (Ingredient item : ingredients) {
                 if (!first) {
-                    builder.append(" AND ");
+                    builder.append(" OR ");
                 } else {
                     first = false;
+                    builder.append(" ");
                 }
-                builder.append("ID=");
+                builder.append("INGREDIENTID=");
                 builder.append(item.getId().toString());
             }
 
