@@ -11,9 +11,11 @@ import eu.dominiktousek.pv168.cookbook.IngredientAmountManagerImpl;
 import eu.dominiktousek.pv168.cookbook.Recipe;
 import eu.dominiktousek.pv168.cookbook.RecipeManager;
 import eu.dominiktousek.pv168.cookbook.RecipeManagerImpl;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import org.slf4j.Logger;
@@ -107,6 +109,49 @@ public class RecipeDetail extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(parentForm, bundle.getString("background loading failed"),"",JOptionPane.ERROR_MESSAGE);
                     parentForm.dispose();
                 }
+            }
+        }
+
+    }
+    
+    private class RemoveRecipeWorker extends SwingWorker<Boolean,Void>{
+
+        private final Long recipeId;
+        private final javax.swing.JFrame parentForm;
+
+        public RemoveRecipeWorker(Long recipeId, javax.swing.JFrame parentForm){
+            this.recipeId = recipeId;
+            this.parentForm = parentForm;
+        }
+
+        @Override
+        protected Boolean doInBackground() throws Exception {
+            try{
+                IngredientAmountManager iaMan = new IngredientAmountManagerImpl();
+                List<IngredientAmount> amounts = iaMan.getIngredientsByRecipe(recipeId);
+                
+                for(IngredientAmount item : amounts){
+                    iaMan.deleteIngredientFromRecipe(item.getId());
+                }
+                
+                RecipeManager man = new RecipeManagerImpl();
+                man.deleteRecipe(recipeId);
+            }catch(Exception ex){
+                LOG.info("Background remove of recipe was not successfull", ex);
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        protected void done(){
+            try {
+                if(get()){
+                    dispose();
+                }
+            } catch (InterruptedException | ExecutionException ex) {
+                LOG.info("Background remove of recipe was not successfull", ex);
+                JOptionPane.showMessageDialog(parentForm, bundle.getString("remove failed"),"",JOptionPane.ERROR_MESSAGE);
             }
         }
 
@@ -265,6 +310,11 @@ public class RecipeDetail extends javax.swing.JFrame {
         jButton4.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         jButton4.setText(bundle.getString("remove")); // NOI18N
         jButton4.setEnabled(false);
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -345,6 +395,26 @@ public class RecipeDetail extends javax.swing.JFrame {
         editIng.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         editIng.setVisible(true);
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        //Custom button text
+        Object[] options = {
+            bundle.getString("yes"),
+            bundle.getString("no")
+        };
+            
+        int n = JOptionPane.showOptionDialog(this,
+            bundle.getString("confirm delete"),
+            "",
+            JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            options[1]);
+        if(n==0){
+            new RemoveRecipeWorker(recipeId, this).execute();
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     /**
      * @param args the command line arguments
