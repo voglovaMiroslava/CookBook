@@ -13,6 +13,7 @@ import eu.dominiktousek.pv168.cookbook.Recipe;
 import eu.dominiktousek.pv168.cookbook.RecipeManager;
 import eu.dominiktousek.pv168.cookbook.RecipeManagerImpl;
 import eu.dominiktousek.pv168.cookbook.ServiceFailureException;
+import static java.lang.Math.abs;
 import java.time.Duration;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -58,9 +59,13 @@ public class EditRecipe extends javax.swing.JFrame {
             try {
                 Recipe recipe = this.get();
                 jTextField1.setText(recipe.getName());
-                Long d = recipe.getDuration().toDays();
-                Long h = recipe.getDuration().toHours();
-                Long m = recipe.getDuration().toMinutes();
+                
+                Long rem = 0l;                
+                Long d = abs(recipe.getDuration().toDays());
+                rem+= d*24l*60l;
+                Long h = abs(recipe.getDuration().toHours())-(rem/60l);
+                rem+= h*60l;
+                Long m = abs(recipe.getDuration().toMinutes())-rem;
                
                 int unit = 0;
                 if((h>0)&&(h*60==m)){
@@ -164,7 +169,10 @@ public class EditRecipe extends javax.swing.JFrame {
         protected void done() {   
             try {
                 if(get()){
-                    recipeId = recipe.getId();
+                    if(recipeId==null){
+                        recipeId = recipe.getId();
+                        ingredientsLoaded = true;
+                    }
                     loadData();
                 }else{
                     JOptionPane.showMessageDialog(parentForm, bundle.getString("saving failed"),"",JOptionPane.ERROR_MESSAGE);
@@ -548,10 +556,13 @@ public class EditRecipe extends javax.swing.JFrame {
         switch(jComboBox1.getSelectedIndex()){
             case 0 : 
                 r.setDuration(Duration.ofMinutes((Long)jSpinner1.getValue()));
+                break;
             case 1 : 
                 r.setDuration(Duration.ofHours((Long)jSpinner1.getValue()));
+                break;
             case 2 : 
                 r.setDuration(Duration.ofDays((Long)jSpinner1.getValue()));
+                break;
         }
         
         new SaveRecipeInfoWorker(r, this).execute();
