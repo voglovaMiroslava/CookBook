@@ -12,9 +12,7 @@ import eu.dominiktousek.pv168.cookbook.IngredientManagerImpl;
 import eu.dominiktousek.pv168.cookbook.Recipe;
 import eu.dominiktousek.pv168.cookbook.RecipeManagerImpl;
 import eu.dominiktousek.pv168.cookbook.ServiceFailureException;
-import java.sql.SQLException;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
 import javax.swing.ComboBoxModel;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -87,6 +85,11 @@ public class MainForm extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         tabbedPanel.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        tabbedPanel.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tabbedPanelFocusGained(evt);
+            }
+        });
 
         tableIngredient.setModel(new IngredientTableModel());
         tableIngredient.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -475,7 +478,7 @@ public class MainForm extends javax.swing.JFrame {
 
         IngredientTableModel model = (IngredientTableModel) tableIngredient.getModel();
                 
-        javax.swing.JFrame editIng = new AddEditIngredient(model.getValueByRow(rowNum).getId());
+        javax.swing.JFrame editIng = new AddEditIngredient(model.getValueByRow(rowNum));
         editIng.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         editIng.setVisible(true);
     }//GEN-LAST:event_buttEditIngActionPerformed
@@ -497,10 +500,12 @@ public class MainForm extends javax.swing.JFrame {
 
     private void menuShowRecipesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuShowRecipesActionPerformed
         tabbedPanel.setSelectedIndex(1);
+        buttSearchRecActionPerformed(new java.awt.event.ActionEvent(new Object(), 0, "command"));
     }//GEN-LAST:event_menuShowRecipesActionPerformed
 
     private void menuShowIngredienceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuShowIngredienceActionPerformed
         tabbedPanel.setSelectedIndex(0);
+        buttSearchIngActionPerformed(new java.awt.event.ActionEvent(new Object(), 0, "command"));
     }//GEN-LAST:event_menuShowIngredienceActionPerformed
 
     private void menuExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuExitActionPerformed
@@ -667,6 +672,10 @@ public class MainForm extends javax.swing.JFrame {
 
         (new RemoveRecipeWorker(ingId)).execute();
     }//GEN-LAST:event_buttRemoveRecipeActionPerformed
+
+    private void tabbedPanelFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tabbedPanelFocusGained
+
+    }//GEN-LAST:event_tabbedPanelFocusGained
 
     /**
      * @param args the command line arguments

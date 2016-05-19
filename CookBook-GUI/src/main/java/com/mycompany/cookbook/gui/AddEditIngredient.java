@@ -5,19 +5,25 @@
  */
 package com.mycompany.cookbook.gui;
 
+import eu.dominiktousek.pv168.cookbook.Ingredient;
+import eu.dominiktousek.pv168.cookbook.IngredientManagerImpl;
+import java.awt.event.InvocationEvent;
+import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
+
 /**
  *
  * @author Dominik
  */
 public class AddEditIngredient extends javax.swing.JFrame {
 
-    private final Long recipeId;
+    private final Ingredient ingr;
 
     /**
      * Creates new form AddEditIngredient
      */
-    public AddEditIngredient(Long id) {
-        recipeId = id;
+    public AddEditIngredient(Ingredient ing) {
+        ingr = ing;
         initComponents();
     }
 
@@ -31,9 +37,9 @@ public class AddEditIngredient extends javax.swing.JFrame {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        fieldName = new javax.swing.JTextField();
         buttCancel = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        buttOK = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMaximumSize(new java.awt.Dimension(453, 95));
@@ -45,7 +51,9 @@ public class AddEditIngredient extends javax.swing.JFrame {
         jLabel1.setText(bundle.getString("name")); // NOI18N
         jLabel1.setToolTipText("");
 
-        jTextField1.setText("Some text");
+        if(ingr != null){
+            fieldName.setText(ingr.getName());
+        }
 
         buttCancel.setText(bundle.getString("cancel")); // NOI18N
         buttCancel.addActionListener(new java.awt.event.ActionListener() {
@@ -54,7 +62,12 @@ public class AddEditIngredient extends javax.swing.JFrame {
             }
         });
 
-        jButton3.setText(bundle.getString("ok")); // NOI18N
+        buttOK.setText(bundle.getString("ok")); // NOI18N
+        buttOK.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttOKActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -66,12 +79,12 @@ public class AddEditIngredient extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField1))
+                        .addComponent(fieldName))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 294, Short.MAX_VALUE)
                         .addComponent(buttCancel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3)))
+                        .addComponent(buttOK)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -80,11 +93,11 @@ public class AddEditIngredient extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(fieldName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(buttCancel)
-                    .addComponent(jButton3))
+                    .addComponent(buttOK))
                 .addContainerGap(20, Short.MAX_VALUE))
         );
 
@@ -95,46 +108,50 @@ public class AddEditIngredient extends javax.swing.JFrame {
         super.dispose();
     }//GEN-LAST:event_buttCancelActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(AddEditIngredient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(AddEditIngredient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(AddEditIngredient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(AddEditIngredient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    private void buttOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttOKActionPerformed
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("com/mycompany/cookbook/gui/Bundle");
+        
+        String name = fieldName.getText();
+        if (name.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    bundle.getString("empty name"),
+                    "",
+                    JOptionPane.ERROR_MESSAGE);
         }
-        //</editor-fold>
-        //</editor-fold>
+        
+        (new EditIngredientWorker(name)).execute();        
+        this.dispose();
+    }//GEN-LAST:event_buttOKActionPerformed
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new AddEditIngredient(null).setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttCancel;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton buttOK;
+    private javax.swing.JTextField fieldName;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
+
+    private class EditIngredientWorker extends SwingWorker<Integer, Void> {
+        
+        private String name;
+        
+        public EditIngredientWorker(String name){
+            this.name=name;
+        }
+        
+        
+        @Override
+        protected Integer doInBackground() throws Exception {
+            IngredientManagerImpl man = new IngredientManagerImpl();
+            if(ingr == null){
+                Ingredient in = new Ingredient();
+                in.setName(name);
+                man.createIngredient(in);
+                return 1;
+            }            
+            ingr.setName(name);
+            man.updateIngredient(ingr);
+            return 2;
+        }
+    }
 }
