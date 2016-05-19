@@ -11,10 +11,13 @@ package com.mycompany.cookbook.gui;
  */
 public class AddEditIngredient extends javax.swing.JFrame {
 
+    private final Long recipeId;
+
     /**
      * Creates new form AddEditIngredient
      */
-    public AddEditIngredient() {
+    public AddEditIngredient(Long id) {
+        recipeId = id;
         initComponents();
     }
 
@@ -89,7 +92,7 @@ public class AddEditIngredient extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttCancelActionPerformed
-         super.dispose();
+        super.dispose();
     }//GEN-LAST:event_buttCancelActionPerformed
 
     /**
@@ -123,7 +126,7 @@ public class AddEditIngredient extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new AddEditIngredient().setVisible(true);
+                new AddEditIngredient(null).setVisible(true);
             }
         });
     }

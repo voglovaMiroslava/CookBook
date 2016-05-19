@@ -468,8 +468,16 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_menuAddRecipeActionPerformed
 
     private void buttEditIngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttEditIngActionPerformed
-        
+        int rowNum = tableIngredient.getSelectedRow();
+        if (rowNum == -1) {
+            return;
+        }
 
+        IngredientTableModel model = (IngredientTableModel) tableIngredient.getModel();
+                
+        javax.swing.JFrame editIng = new AddEditIngredient(model.getValueByRow(rowNum).getId());
+        editIng.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        editIng.setVisible(true);
     }//GEN-LAST:event_buttEditIngActionPerformed
 
     private void fieldIngredientNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldIngredientNameActionPerformed
@@ -529,7 +537,7 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_buttAddRecipeActionPerformed
 
     private void buttAddIngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttAddIngActionPerformed
-        javax.swing.JFrame editIng = new AddEditIngredient();
+        javax.swing.JFrame editIng = new AddEditIngredient(null);
         editIng.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         editIng.setVisible(true);
     }//GEN-LAST:event_buttAddIngActionPerformed

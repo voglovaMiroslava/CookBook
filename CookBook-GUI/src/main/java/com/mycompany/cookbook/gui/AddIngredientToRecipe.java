@@ -180,7 +180,7 @@ public class AddIngredientToRecipe extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttCreateIngActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttCreateIngActionPerformed
-        javax.swing.JFrame editIng = new AddEditIngredient();
+        javax.swing.JFrame editIng = new AddEditIngredient(null);
         editIng.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         editIng.setVisible(true);
     }//GEN-LAST:event_buttCreateIngActionPerformed
